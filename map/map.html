@@ -228,6 +228,16 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
 @media(max-width:900px){.map-panel{max-height:none}.panel-list{max-height:220px}}
 @media(pointer:coarse){.pin{width:20px;height:20px}.pin-dot{width:7px;height:7px}}
 
+
+/* The sidebar must never stretch the map's image-sized stage. */
+.map-shell{align-items:start}
+.map-stage{align-self:start;width:100%;background:transparent}
+.map-frame{width:100%;height:auto;aspect-ratio:1651 / 953}
+.map-panel{height:var(--map-height,auto);min-height:0;max-height:none;overflow:auto}
+.panel-search,.panel-detail{flex-shrink:0}
+.panel-list{min-height:0;max-height:none}
+@media(max-width:900px){.map-panel{height:auto;overflow:visible}.panel-list{max-height:220px}}
+
 </style>
 </head>
 <body>
@@ -469,6 +479,7 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
   var MIN_SCALE = 1, MAX_SCALE = 5;
 
   function apply(){
+    document.querySelector(".map-shell").style.setProperty("--map-height", frame.clientHeight + "px");
     inner.style.setProperty("--marker-scale",1/scale);
     inner.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + scale + ")";
   }
