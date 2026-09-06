@@ -231,8 +231,8 @@ section{padding:44px 0 6px;}
   display:grid; grid-template-columns:56px 1fr 96px 104px; padding:11px 18px; gap:10px;
 }
 .board-row{
-  display:grid; grid-template-columns:56px 1fr 96px 104px; gap:10px; align-items:center;
-  padding:16px 18px; border-top:2px solid var(--ink); text-decoration:none; color:var(--ink);
+  display:grid; grid-template-columns:56px 1fr 110px 110px; gap:20px; align-items:center;
+  padding:26px 22px; border-top:2px solid var(--ink); text-decoration:none; color:var(--ink);
   background:var(--paper); width:100%; text-align:left; font-family:var(--font-en); cursor:pointer;
 }
 .board-row:hover{background:var(--gold-pale);}
@@ -242,8 +242,8 @@ section{padding:44px 0 6px;}
   background:var(--paper);
 }
 .board-ico svg{width:19px; height:19px;}
-.board-row .t{font-weight:700; font-size:18px;}
-.board-row .d{font-size:15px; color:var(--ink-soft); margin-top:2px;}
+.board-row .t{display:block; font-weight:700; font-size:19px; line-height:1.35;}
+.board-row .d{display:block; font-size:15px; color:var(--ink-soft); margin-top:6px; line-height:1.55;}
 .board-stat{font-size:15px; text-align:right; color:var(--ink-soft);}
 .board-stat b{display:block; font-size:18px; color:var(--ink);}
 
@@ -517,8 +517,10 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
 .urlbar input{min-width:0;width:100%}
 @media(max-width:520px){
  main{padding-left:16px;padding-right:16px}.hero{gap:20px}
- .board-head,.board-row{grid-template-columns:30px minmax(0,1fr);padding:12px;gap:10px}
- .board-stat{display:none}.board-head>*:nth-child(n+3){display:none}
+ .board-head,.board-row{grid-template-columns:30px minmax(0,1fr);padding:20px 16px;gap:14px}
+ .board-stat{display:block;grid-column:2;text-align:left;font-size:14px;margin-top:2px}
+ .board-stat b{display:inline;margin-right:5px}
+ .board-head>*:nth-child(n+3){display:none}
  .browser-chrome{gap:5px;padding:8px}.chrome-btn{width:28px;padding:3px}
  .auth-body{padding:18px 14px}.sheet-foot{flex-wrap:wrap}
  .card-flip{max-width:100%}.boardnav-inner{gap:6px}
@@ -641,24 +643,6 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
           <span class="board-stat"><b>26</b><span class="rune">ちてん</span><span class="eng">locations</span></span>
           <span class="board-stat"><span class="rune">こうかい</span><span class="eng">Open</span></span>
         </a>
-        <a class="board-row" href="#nen">
-          <span class="board-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span>
-          <span><span class="t"><span class="rune">ねんろん</span><span class="eng">Nen Theory</span></span><span class="d"><span class="rune">６けいとう・すいけんげん・きそしゅぎょう</span><span class="eng">Six categories, water divination, basic training</span></span></span>
-          <span class="board-stat"><b>128</b><span class="rune">スレ</span><span class="eng">threads</span></span>
-          <span class="board-stat"><span class="rune">こうかい</span><span class="eng">Open</span></span>
-        </a>
-        <a class="board-row" href="#geo">
-          <span class="board-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg></span>
-          <span><span class="t"><span class="rune">ちりじょうほう</span><span class="eng">Geography</span></span><span class="d"><span class="rune">６たいりく・こくきょう・くらいちいき</span><span class="eng">The six continents, borders, and dark regions</span></span></span>
-          <span class="board-stat"><b>61</b><span class="rune">スレ</span><span class="eng">threads</span></span>
-          <span class="board-stat"><span class="rune">こうかい</span><span class="eng">Open</span></span>
-        </a>
-        <a class="board-row" href="#exam">
-          <span class="board-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M5 3h14v18l-7-4-7 4z"/></svg></span>
-          <span><span class="t"><span class="rune">しけんきろく</span><span class="eng">Exam Records</span></span><span class="d"><span class="rune">かこの かいじょう・ごうかくりつ・しけんかん</span><span class="eng">Past venues, pass rates, examiners</span></span></span>
-          <span class="board-stat"><b>203</b><span class="rune">スレ</span><span class="eng">threads</span></span>
-          <span class="board-stat"><span class="rune">こうかい</span><span class="eng">Open</span></span>
-        </a>
       </div>
     </section>
 
@@ -669,44 +653,6 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
       </div>
       <p class="section-desc"><span class="rune">こうかい きろく です。ハンターきょうかい の こうしき はっぴょう と、りようしゃ の とうこう が まざって います。ゆうりょう じょうほう は ここには ありません。</span><span class="eng">Public records — a mix of official Association bulletins and user posts. Nothing sold for a price appears here.</span></p>
 
-      <div class="grid-cards">
-        <div class="icard">
-          <span class="tag"><span class="rune">ねん</span><span class="eng">NEN</span></span>
-          <h3><span class="rune">ねんの ６けいとう</span><span class="eng">The Six Nen Categories</span></h3>
-          <p><span class="rune">きょうか・へんか・ぐげんか・ほうしゅつ・そうさ・とくしつ。すいけんげん による はんてい と、せいかく との かんけい。</span><span class="eng">Enhancement, Transmutation, Conjuration, Emission, Manipulation, Specialization — how water divination sorts a user, and how personality tends to predict it.</span></p>
-          <div class="meta"><span>84</span><span><span class="rune">３にちまえ</span><span class="eng">3d ago</span></span></div>
-        </div>
-        <div class="icard">
-          <span class="tag"><span class="rune">ちり</span><span class="eng">GEOGRAPHY</span></span>
-          <h3><span class="rune">６たいりく と そのそと</span><span class="eng">The Six Continents &amp; Beyond</span></h3>
-          <p><span class="rune">ちずに のっている せかい は ぜんたいの ごくいちぶ です。そのそと へ でる には きょかしょう が いります。</span><span class="eng">The mapped world is only a sliver of the whole. Leaving it requires authorization.</span></p>
-          <div class="meta"><span>61</span><span><span class="rune">１しゅうまえ</span><span class="eng">1w ago</span></span></div>
-        </div>
-        <div class="icard">
-          <span class="tag"><span class="rune">きろく</span><span class="eng">ARCHIVE</span></span>
-          <h3><span class="rune">ハンターしけん きろく</span><span class="eng">Hunter Exam Records</span></h3>
-          <p><span class="rune">かいじょう は まいかい かわります。ごうかくりつ は １まんにんに ひとり ていど。しっかくれい も よんで ください。</span><span class="eng">The venue changes every year. Pass rates hover near one in ten thousand. Read the disqualification list too.</span></p>
-          <div class="meta"><span>203</span><span><span class="rune">２にちまえ</span><span class="eng">2d ago</span></span></div>
-        </div>
-        <div class="icard">
-          <span class="tag"><span class="rune">つうしん</span><span class="eng">NETWORK</span></span>
-          <h3><span class="rune">かいせん と とうろくばんごう</span><span class="eng">Lines &amp; Registration Numbers</span></h3>
-          <p><span class="rune">かいせん と とうろくばんごう を かえば、じょうほう に つながります。めんきょ が あれば むりょう です。</span><span class="eng">Buy a line and a registration number and the information opens up. With a license, it costs nothing.</span></p>
-          <div class="meta"><span>39</span><span><span class="rune">４にちまえ</span><span class="eng">4d ago</span></span></div>
-        </div>
-        <div class="icard">
-          <span class="tag"><span class="rune">めいぼ</span><span class="eng">DIRECTORY</span></span>
-          <h3><span class="rune">はばつ と だんたい</span><span class="eng">Factions &amp; Organizations</span></h3>
-          <p><span class="rune">マフィアンコミュニティ、しょうかいけ、ようへいだん。こうかい できる はんい でのみ きさい。</span><span class="eng">The Mafia community, merchant houses, mercenary bands — listed only as far as is publicly permissible.</span></p>
-          <div class="meta"><span>97</span><span><span class="rune">５にちまえ</span><span class="eng">5d ago</span></span></div>
-        </div>
-        <div class="icard">
-          <span class="tag"><span class="rune">ちゅうい</span><span class="eng">NOTICE</span></span>
-          <h3><span class="rune">りゅうせいがい に ついて</span><span class="eng">Regarding Meteor City</span></h3>
-          <p><span class="rune">こせき が そんざい しません。じゅうみん は とうろく されて おらず、こうてき きろく も ありません。しんせい の さいは べつ しょしき に なります。</span><span class="eng">No census exists. Residents are unregistered and hold no official records. Applications use a separate form.</span></p>
-          <div class="meta"><span>18</span><span><span class="rune">２しゅうまえ</span><span class="eng">2w ago</span></span></div>
-        </div>
-      </div>
     </section>
   </div>
 
@@ -973,6 +919,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
       $("metaReg").textContent = "—";
     }
     renderCard();
+    applyHunterUI();
   }
 
   $("signupBtn").addEventListener("click", function(){
@@ -1062,7 +1009,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
     if(syncing) return;
     syncing = true;
     var generation = authGeneration;
-    setHunter(false);
+    setHunter(false, {quiet:true});
     try{
       var userRes = await sb.auth.getUser();
       if(userRes.error) throw userRes.error;
@@ -1081,7 +1028,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
       $("loginErr").classList.remove("show");
     }catch(err){
       if(generation !== authGeneration) return;
-      setHunter(false);
+      setHunter(false, {quiet:true});
       $("loginErr").textContent = "Could not verify access: " + err.message;
       $("loginErr").classList.add("show");
       show("login");
@@ -1092,7 +1039,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
     sb.auth.onAuthStateChange(function(event, session){
       if(!session){
         authGeneration++;
-        state.account=null; state.sheet=null; setHunter(false); applyAccount();
+        state.account=null; state.sheet=null; setHunter(false, {quiet:true}); applyAccount();
       } else if(event === "INITIAL_SESSION" || event === "SIGNED_IN"){
         // Supabase calls must run after the auth callback releases its lock.
         setTimeout(afterSignIn,0);
@@ -1103,12 +1050,56 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   // ---------- hunter status ----------
   // Set by staff (Discord role sync), NOT by a form on this site.
   // The character sheet lives inside the Tavern, because only Hunters are in the registry.
-  function setHunter(on){
+  function setHunter(on, opts){
+    var wasHunter = state.hunter === true;
     state.hunter = !!on;
     document.body.classList.toggle("is-hunter", state.hunter);
-    if(!state.hunter){
+    applyHunterUI();
+    // Only tear down the Tavern on a genuine loss of access.
+    // Passing {quiet:true} means "we're re-verifying" — don't eject.
+    var quiet = opts && opts.quiet;
+    if(!state.hunter && !quiet && wasHunter){
       if($("view-tavern").classList.contains("active")) show("world");
       if(vp){ renderHome(); browserEl.classList.remove("cinema"); document.body.style.overflow=""; }
+    }
+  }
+
+  // ============================================================
+  // Registered Hunters don't need the sign-up panel or the blank
+  // demo card. Hide them once the account is a confirmed Hunter.
+  // ============================================================
+  function applyHunterUI(){
+    var isHunter = state.hunter === true;
+
+    // hide the "Enter License Number" CTA once carded
+    var loginCta = document.querySelector('.hero-cta [data-goto="login"]');
+    if(loginCta) loginCta.style.display = isHunter ? "none" : "";
+
+    // hide the whole Sign Up tab + pane for registered Hunters
+    var upTab = document.querySelector('.auth-tab[data-pane="up"]');
+    if(upTab) upTab.style.display = isHunter ? "none" : "";
+    if(isHunter){
+      var paneUp = $("pane-up"), paneIn = $("pane-in");
+      if(paneUp && paneUp.classList.contains("active")){
+        paneUp.classList.remove("active");
+        if(paneIn) paneIn.classList.add("active");
+        var inTab = document.querySelector('.auth-tab[data-pane="in"]');
+        if(inTab) inTab.classList.add("active");
+        if(upTab) upTab.classList.remove("active");
+      }
+    }
+
+    // Once someone is a registered Hunter, the hero card comes off —
+    // their live card number already sits in the nav chip. It stays on
+    // screen for everyone else as the "not yet issued" prompt.
+    var cardCol = document.querySelector(".card-col");
+    if(cardCol) cardCol.style.display = isHunter ? "none" : "";
+
+    // A registered Hunter has nothing to sign up for.
+    var authSection = $("view-login");
+    if(authSection){
+      var lead = authSection.querySelector(".section-desc");
+      if(lead) lead.style.display = isHunter ? "none" : "";
     }
   }
 
