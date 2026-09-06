@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>せかいちず | GRAND x BEYOND</title>
+<style>
+
+@font-face{
+  font-family:'HunterX';
+  src:url('assets/hunterx.otf') format('opentype');
+  font-display:block;
+}
+
+:root{
+  --paper:#ffffff;
+  --ink:#000000;
+  --ink-soft:#3a3a3a;
+  --gold:#c9a24c;
+  --gold-deep:#8a6a25;
+  --gold-pale:#f6eed6;
+  --navy:#1a2b56;
+  --navy-light:#33447a;
+  --rule:#c9c4b4;
+  --danger:#a32115;
+  --fs-base:18px;
+  --font-en:'MS PGothic','ＭＳ Ｐゴシック','MS UI Gothic','Osaka',sans-serif;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--font-en); font-size:var(--fs-base); line-height:1.7;
+}
+a{color:var(--ink);}
+.rune{font-family:'HunterX',sans-serif; letter-spacing:.03em;}
+.eng{display:none;}
+body.translated .rune{display:none;}
+body.translated .eng{display:inline;}
+
+.btn{
+  font-family:var(--font-en); font-size:16px; font-weight:700;
+  padding:11px 22px; cursor:pointer; text-decoration:none;
+  display:inline-flex; align-items:center; gap:9px;
+  background:var(--paper); color:var(--ink);
+  border:2px solid var(--ink); box-shadow:3px 3px 0 var(--navy);
+}
+.btn:hover{background:var(--gold-pale);}
+.btn:active{transform:translate(3px,3px); box-shadow:0 0 0 var(--navy);}
+.btn:focus-visible{outline:3px solid var(--gold-deep); outline-offset:2px;}
+
+.masthead{border-bottom:3px solid var(--ink); background:var(--paper);}
+.masthead-inner{
+  max-width:1160px; margin:0 auto; padding:18px 22px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+}
+.masthead-inner a.back{
+  font-size:16px; font-weight:700; text-decoration:none; color:var(--ink);
+  display:flex; align-items:center; gap:8px;
+}
+.masthead-inner a.back:hover{color:var(--navy);}
+.masthead-title{font-size:19px; font-weight:700; text-align:right;}
+.masthead-title .sub{display:block; font-size:13px; font-weight:400; color:var(--ink-soft);}
+
+.translate-toggle{
+  display:inline-flex; align-items:center; gap:9px; font-size:15px; font-weight:700;
+  background:var(--paper); border:2px solid var(--ink); color:var(--ink);
+  padding:8px 15px; cursor:pointer; box-shadow:3px 3px 0 var(--gold-deep); font-family:var(--font-en);
+}
+.translate-toggle:hover{background:var(--gold-pale);}
+.translate-toggle:active{transform:translate(3px,3px); box-shadow:0 0 0;}
+.translate-toggle .dot{width:9px; height:9px; background:var(--danger); border:1px solid var(--ink);}
+body.translated .translate-toggle .dot{background:#2f7d3f;}
+
+main{max-width:1160px; margin:0 auto; padding:26px 22px 20px;}
+.section-head{
+  display:flex; align-items:baseline; gap:14px; margin-bottom:16px;
+  border-bottom:3px solid var(--ink); padding-bottom:10px; flex-wrap:wrap;
+}
+.section-title{font-size:26px; font-weight:700;}
+.section-desc{font-size:16px; max-width:70ch; margin:10px 0 20px; color:var(--ink-soft);}
+
+/* ================= MAP ================= */
+.map-shell{
+  display:grid; grid-template-columns:1fr 320px; gap:0;
+  border:3px solid var(--ink); box-shadow:6px 6px 0 var(--navy);
+}
+@media (max-width:900px){ .map-shell{grid-template-columns:1fr;} }
+
+.map-stage{
+  position:relative; overflow:hidden; background:#000;
+  border-right:3px solid var(--ink);
+}
+@media (max-width:900px){ .map-stage{border-right:none; border-bottom:3px solid var(--ink);} }
+
+.map-frame{
+  position:relative; width:100%;
+  aspect-ratio:1651/953;
+  overflow:hidden;
+  cursor:grab;
+  touch-action:none;
+}
+.map-frame.grabbing{cursor:grabbing;}
+.map-inner{
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  transform-origin:0 0;
+  transition:transform .18s ease-out;
+}
+.map-inner.dragging{transition:none;}
+.map-inner img{
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  display:block; user-select:none; -webkit-user-drag:none; pointer-events:none;
+}
+
+.pin{
+  position:absolute; transform:translate(-50%,-50%);
+  width:22px; height:22px; border-radius:50%;
+  border:2.5px solid var(--ink); background:var(--gold);
+  cursor:pointer; padding:0;
+  box-shadow:0 0 0 2px #fff, 2px 2px 0 rgba(0,0,0,.35);
+}
+.pin.region{
+  width:15px; height:15px; border-radius:3px; background:var(--navy);
+  border-color:#fff;
+}
+.pin:hover, .pin:focus-visible{ background:var(--navy); outline:none; }
+.pin.active{ background:var(--danger); }
+.pin:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+.pin-label{
+  position:absolute; left:50%; top:-6px; transform:translate(-50%,-100%);
+  background:var(--ink); color:#fff; font-size:12.5px; font-weight:700;
+  padding:3px 8px; white-space:nowrap; pointer-events:none;
+  opacity:0; transition:opacity .12s ease;
+}
+.pin:hover .pin-label, .pin:focus-visible .pin-label{ opacity:1; }
+
+.map-controls{
+  position:absolute; right:12px; bottom:12px; z-index:5;
+  display:flex; flex-direction:column; gap:6px;
+}
+.map-controls button{
+  width:38px; height:38px; font-size:19px; font-weight:700; cursor:pointer;
+  background:#fff; color:#000; border:2px solid #000; box-shadow:2px 2px 0 rgba(0,0,0,.4);
+}
+.map-controls button:hover{ background:var(--gold-pale); }
+.map-hint{
+  position:absolute; left:12px; bottom:12px; z-index:5;
+  background:rgba(255,255,255,.92); border:2px solid #000; padding:6px 11px;
+  font-size:13px; font-weight:700;
+}
+
+/* ---- side panel ---- */
+.map-panel{ background:var(--paper); display:flex; flex-direction:column; min-height:340px; }
+.panel-search{ padding:14px; border-bottom:2px solid var(--ink); }
+.panel-search input{
+  width:100%; font-family:var(--font-en); font-size:16px; padding:9px 11px; border:2px solid var(--ink);
+}
+.panel-search input:focus{ outline:none; box-shadow:inset 0 0 0 3px var(--gold); }
+.panel-list{ flex:1; overflow-y:auto; max-height:420px; }
+.panel-row{
+  display:block; width:100%; text-align:left; background:none; border:none; cursor:pointer;
+  padding:10px 14px; border-top:1px solid var(--rule); font-family:var(--font-en); font-size:15px;
+}
+.panel-row:hover{ background:var(--gold-pale); }
+.panel-row.active{ background:var(--navy); color:#fff; }
+.panel-row .k{ font-size:10.5px; font-weight:700; letter-spacing:.08em; color:var(--ink-soft); }
+.panel-row.active .k{ color:#cfd6ea; }
+.panel-empty{ padding:20px 14px; font-size:14px; color:var(--ink-soft); }
+
+.panel-detail{
+  border-top:3px solid var(--ink); padding:16px 16px 18px; display:none;
+}
+.panel-detail.on{ display:block; }
+.panel-detail h3{ font-size:21px; margin:0 0 4px; }
+.panel-detail h3 .eng{ font-size:16px; }
+.panel-detail .k{ font-size:12px; font-weight:700; color:var(--ink-soft); letter-spacing:.08em; margin-bottom:10px; }
+.panel-detail p{ font-size:14.5px; color:var(--ink-soft); margin:0; line-height:1.75; }
+.panel-detail .goto{ margin-top:12px; }
+
+@media (max-width:900px){
+  .panel-list{ max-height:220px; }
+}
+@media (max-width:520px){
+  .fs-base{ font-size:16px; }
+  .section-title{ font-size:22px; }
+  .map-controls button{ width:34px; height:34px; font-size:17px; }
+}
+
+footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper); }
+.footer-in{ max-width:1160px; margin:0 auto; padding:22px; font-size:13.5px; color:var(--ink-soft); }
+
+.skip{position:absolute; left:-9999px; background:var(--ink); color:#fff; padding:10px 16px; z-index:99;}
+.skip:focus{left:0; top:0;}
+ .map-shell{grid-template-columns:minmax(0,1fr) 300px;border:1px solid var(--navy);box-shadow:none}
+.map-stage{min-width:0;border-right:1px solid var(--navy)}
+.map-panel{min-width:0}.section-head,.masthead{border-bottom-width:1px}
+.btn,.translate-toggle,.map-controls button{border-width:1px;box-shadow:none}
+.panel-search{border-bottom:1px solid var(--rule)}.panel-search input{border-width:1px}
+.panel-detail{border-top:2px solid var(--gold)}
+.panel-row .k{font-size:14px}.panel-row{font-size:18px}.panel-detail p{font-size:18px}
+.map-hint{border:0;max-width:calc(100% - 70px);font-size:14px}
+@media(max-width:900px){.map-shell{grid-template-columns:minmax(0,1fr)}.map-stage{border-right:0}}
+@media(max-width:520px){main{padding:20px 16px}.map-hint{display:none}.masthead-inner{padding:16px}.map-controls{right:6px;bottom:6px;gap:3px}.map-controls button{width:32px;height:32px}}
+
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip">Skip to content</a>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="back" href="../index.html">
+      <span aria-hidden="true">←</span>
+      <span class="rune">せかいじょうほうへ もどる</span><span class="eng">Back to World Information</span>
+    </a>
+    <div class="masthead-title">
+      <span class="rune">せかいちず</span><span class="eng">World Map</span>
+      <span class="sub">GRAND x BEYOND</span>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="section-head">
+    <span class="section-title"><span class="rune">せかいちず</span><span class="eng">World Map</span></span>
+    <button class="translate-toggle" id="translateBtn" aria-pressed="false" style="margin-left:auto;">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="rune">ほんやく</span><span class="eng">Translate</span>
+    </button>
+  </div>
+  <p class="section-desc">
+    <span class="rune">ちず の いち を クリック して ください。ドラッグ で いどう、＋／－ で ズーム できます。</span>
+    <span class="eng">Click any marker to open its record. Drag to pan, use +/− to zoom. Gold circles are cities and landmarks; navy squares are regions and territories.</span>
+  </p>
+
+  <div class="map-shell">
+    <div class="map-stage">
+      <div class="map-frame" id="mapFrame" tabindex="0" aria-label="World map, draggable and zoomable">
+        <div class="map-inner" id="mapInner">
+          <img src="assets/world-map.jpg" alt="World map of the Grand Beyond" draggable="false">
+          <div id="pinLayer"></div>
+        </div>
+      </div>
+      <div class="map-controls">
+        <button id="zoomIn" aria-label="Zoom in">+</button>
+        <button id="zoomOut" aria-label="Zoom out">−</button>
+        <button id="zoomReset" aria-label="Reset view" style="font-size:13px;">⟲</button>
+      </div>
+      <div class="map-hint"><span class="rune">ドラッグ・ズーム かのう</span><span class="eng">Drag &amp; zoom</span></div>
+    </div>
+
+    <div class="map-panel">
+      <div class="panel-search">
+        <input id="q" placeholder="けんさく — search locations" aria-label="Search locations">
+      </div>
+      <div class="panel-list" id="panelList"></div>
+      <div class="panel-detail" id="panelDetail"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-in">
+    <span class="rune">グラン・ビヨンド せかいちず — こうしき さんこうしりょう</span>
+    <span class="eng">GRAND x BEYOND world map — reference material, community maintained</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* =========================================================
+     LOCATIONS
+     x / y are percentages of the map image (1651 x 953), so
+     markers stay correctly placed at any zoom or screen size.
+     kind: "landmark" (gold dot) or "region" (navy square).
+     Descriptions are placeholders — replace with real lore,
+     or link "thread" to an anchor on the World Information page.
+     ========================================================= */
+  var LOCATIONS = [
+    {kind:"landmark", en:"Kukuroo Mountain", jp:"ククロー", x:20.64, y:12.15,
+      desc:"A testing ground associated with the Hunter Exam's more punishing trial sites."},
+    {kind:"landmark", en:"Heaven's Arena", jp:"てんくう", x:36.35, y:22.88,
+      desc:"A 251-floor tower where fighters climb for rank, money, and reputation."},
+    {kind:"landmark", en:"Hunter Selection Committee Hotel", jp:"いいんかい", x:14.06, y:27.38,
+      desc:"Where the Committee convenes to set the terms of each year's Exam."},
+    {kind:"landmark", en:"Numere Wetlands", jp:"ヌメーレ", x:16.71, y:40.29,
+      desc:"A dense marsh region known for unusual wildlife and difficult travel."},
+    {kind:"landmark", en:"Zaban City", jp:"ザバン", x:17.06, y:41.07,
+      desc:"A major trade hub and common starting point for licensed travelers."},
+    {kind:"landmark", en:"Dolle Harbor", jp:"ドル", x:16.09, y:42.10,
+      desc:"A busy port connecting Kukan'yu Kingdom to the wider shipping lanes."},
+    {kind:"landmark", en:"Glam Gas Land", jp:"グラムガス", x:17.60, y:53.32,
+      desc:"An industrial gas-extraction region on the northern edge of Yorbia."},
+    {kind:"landmark", en:"Gordeau Desert", jp:"ゴルドー", x:11.25, y:60.99,
+      desc:"A wide, sparsely traveled desert bordering the western coast."},
+    {kind:"landmark", en:"Yorknew City", jp:"ヨークシン", x:11.16, y:62.08,
+      desc:"Home to the biennial Auction — and no shortage of trouble around it."},
+    {kind:"landmark", en:"Meteor City", jp:"りゅうせいがい", x:28.28, y:65.35,
+      desc:"An unregistered settlement with no civil records. See the note on the World Information board."},
+    {kind:"landmark", en:"Kakin Port City", jp:"カキンこう", x:63.35, y:34.95,
+      desc:"The main sea gateway into the Kakin Empire."},
+    {kind:"landmark", en:"NGL", jp:"エヌジーエル", x:28.68, y:94.81,
+      desc:"A remote lake region, sparsely charted."},
+    {kind:"landmark", en:"Republic of Rakario", jp:"ラカリオ", x:29.71, y:93.86,
+      desc:"One of the small southern republics along the strait."},
+    {kind:"landmark", en:"Republic of West Gorteau", jp:"にしゴルトー", x:30.62, y:92.81,
+      desc:"The western half of the Gorteau republics."},
+    {kind:"landmark", en:"Republic of East Gorteau", jp:"ひがしゴルトー", x:31.71, y:92.50,
+      desc:"The eastern half of the Gorteau republics."},
+    {kind:"landmark", en:"Republic of Hass", jp:"ハス", x:32.50, y:93.34,
+      desc:"A small republic at the southern tip of Yorbia."},
+
+    {kind:"region", en:"Republic of Padokea", jp:"パドキア", x:21.20, y:4.46,
+      desc:"A northern republic on the Yorbia continent."},
+    {kind:"region", en:"Mimbo Republic", jp:"ミンボー", x:23.92, y:18.10,
+      desc:"Home territory to Heaven's Arena."},
+    {kind:"region", en:"Kukan'yu Kingdom", jp:"クカンユー", x:14.48, y:39.45,
+      desc:"A coastal kingdom encompassing Zaban City and Dolle Harbor."},
+    {kind:"region", en:"Jappon", jp:"ジャポン", x:28.62, y:33.58,
+      desc:"An island chain east of Kukan'yu Kingdom."},
+    {kind:"region", en:"United States of Saherta", jp:"サヘルタ", x:17.66, y:56.45,
+      desc:"A federation of states spanning central Yorbia."},
+    {kind:"region", en:"Yorbia", jp:"ヨルビア", x:19.53, y:66.42,
+      desc:"The western continent — home to Yorknew City, Meteor City, and the southern republics."},
+    {kind:"region", en:"Azia", jp:"アジア", x:72.80, y:30.90,
+      desc:"The northern reach of the eastern continent."},
+    {kind:"region", en:"Kakin Kingdom", jp:"カキン", x:71.50, y:39.40,
+      desc:"A large, wealthy kingdom on the eastern continent."},
+    {kind:"region", en:"Federation of Ochima", jp:"オチマ", x:74.32, y:54.30,
+      desc:"A federation occupying the southern half of the eastern continent."},
+    {kind:"region", en:"Begerosse Union", jp:"ベゲロス", x:58.93, y:67.89,
+      desc:"An island union south of the eastern continent."}
+  ];
+
+  function dual(kana,en){return '<span class="rune">'+kana+'</span><span class="eng">'+en+'</span>';}
+  var KANA_DESCRIPTIONS = ["ハンターしけん の きびしい しれん に かかわる ばしょ。", "にひゃくごじゅういっかい の とう。せんし は ちい と かね と めいせい を めざす。", "まいとし の しけん の じょうけん を きめる いいんかい が あつまる。", "めずらしい どうぶつ と いどう の むずかしさ で しられる しっち。", "おおきな こうえき の ちゅうしんち。めんきょ を もつ たびびと の しゅっぱつてん。", "クカンユー と ひろい こうろ を つなぐ にぎやかな みなと。", "ヨルビア の きた の はし に ある ガス さいくつ ちいき。", "にしかいがん に せっする ひろい さばく。たびびと は すくない。", "にねん ごと の オークション の かいさいち。まわり の もんだい も たえない。", "こせき の ない みとうろく の まち。せかいじょうほう の けいじ を さんしょう。", "カキン ていこく への おもな うみ の いりぐち。", "ちず に あまり のっていない とおい みずうみ の ちいき。", "かいきょう ぞい の みなみ の ちいさな きょうわこく の ひとつ。", "ゴルトー きょうわこく の にしがわ。", "ゴルトー きょうわこく の ひがしがわ。", "ヨルビア の なんたん の ちいさな きょうわこく。", "ヨルビア たいりく の きた の きょうわこく。", "てんくうとうぎじょう が ある ちいき。", "ザバン と ドル を ふくむ かいがん の おうこく。", "クカンユー の ひがし に ある しまじま。", "ヨルビア ちゅうおう に ひろがる れんぽう。", "ヨークシン と りゅうせいがい と みなみ の きょうわこく が ある にし の たいりく。", "ひがし の たいりく の ほくぶ。", "ひがし の たいりく の おおきく ゆたかな おうこく。", "ひがし の たいりく の みなみはんぶん を しめる れんぽう。", "ひがし の たいりく の みなみ に ある しま の れんごう。"];
+  LOCATIONS.forEach(function(loc,i){loc.descKana=KANA_DESCRIPTIONS[i];});
+  /* ---------------- translate ---------------- */
+  var tBtn = $("translateBtn");
+  tBtn.addEventListener("click", function(){
+    var on = document.body.classList.toggle("translated");
+    tBtn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+
+  /* ---------------- pins ---------------- */
+  var pinLayer = $("pinLayer");
+  var selected = -1;
+
+  LOCATIONS.forEach(function(loc, i){
+    var b = document.createElement("button");
+    b.className = "pin" + (loc.kind === "region" ? " region" : "");
+    b.style.left = loc.x + "%";
+    b.style.top = loc.y + "%";
+    b.setAttribute("aria-label", loc.en);
+    b.dataset.i = i;
+    var label = document.createElement("span");
+    label.className = "pin-label";
+    label.innerHTML = dual(loc.jp,loc.en);
+    b.appendChild(label);
+    b.addEventListener("click", function(e){ e.stopPropagation(); if(!moved) select(i); });
+    pinLayer.appendChild(b);
+  });
+
+  /* ---------------- side panel list ---------------- */
+  var listEl = $("panelList"), detailEl = $("panelDetail"), qEl = $("q");
+
+  function renderList(){
+    var query = qEl.value.trim().toLowerCase();
+    var rows = LOCATIONS
+      .map(function(loc, i){ return {loc:loc, i:i}; })
+      .filter(function(o){ return !query || (o.loc.en+" "+o.loc.jp).toLowerCase().indexOf(query) !== -1; });
+
+    if(!rows.length){
+      listEl.innerHTML = '<div class="panel-empty"><span class="rune">みつかりません</span><span class="eng">No matches</span></div>';
+      return;
+    }
+    listEl.innerHTML = rows.map(function(o){
+      var loc = o.loc;
+      return '<button class="panel-row' + (o.i === selected ? ' active' : '') + '" data-i="' + o.i + '">' +
+        '<span class="k">' + (loc.kind === "region" ? dual("ちいき","REGION") : dual("めいしょ","LANDMARK")) + '</span><br>' +
+        '<span class="rune">' + loc.jp + '</span><span class="eng">' + loc.en + '</span>' +
+        '</button>';
+    }).join("");
+  }
+
+  listEl.addEventListener("click", function(e){
+    var btn = e.target.closest(".panel-row");
+    if(!btn) return;
+    select(parseInt(btn.dataset.i, 10));
+  });
+  qEl.addEventListener("input", renderList);
+
+  function select(i){
+    selected = i;
+    var loc = LOCATIONS[i];
+    var pins = pinLayer.querySelectorAll(".pin");
+    pins.forEach(function(p){ p.classList.toggle("active", parseInt(p.dataset.i,10) === i); });
+    renderList();
+
+    detailEl.className = "panel-detail on";
+    detailEl.innerHTML =
+      '<h3><span class="rune">' + loc.jp + '</span><span class="eng">' + loc.en + '</span></h3>' +
+      '<div class="k">' + (loc.kind === "region" ? dual("ちいき","REGION") : dual("めいしょ","LANDMARK")) + '</div>' +
+      '<p>' + dual(loc.descKana,loc.desc) + '</p>';
+
+    // gently center the map on the selected pin
+    panTo(loc.x, loc.y);
+  }
+
+  renderList();
+
+  /* ---------------- pan & zoom ---------------- */
+  var frame = $("mapFrame"), inner = $("mapInner");
+  var scale = 1, tx = 0, ty = 0;
+  var MIN_SCALE = 1, MAX_SCALE = 5;
+
+  function apply(){
+    inner.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + scale + ")";
+  }
+  function clamp(){
+    var fw = frame.clientWidth, fh = frame.clientHeight;
+    var w = fw * scale, h = fh * scale;
+    var minX = Math.min(0, fw - w);
+    var minY = Math.min(0, fh - h);
+    tx = Math.max(minX, Math.min(0, tx));
+    ty = Math.max(minY, Math.min(0, ty));
+  }
+  function zoomAt(factor, cx, cy){
+    var newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+    if(newScale === scale) return;
+    var fw = frame.clientWidth, fh = frame.clientHeight;
+    var px = (cx === undefined) ? fw/2 : cx;
+    var py = (cy === undefined) ? fh/2 : cy;
+    var ratio = newScale / scale;
+    tx = px - (px - tx) * ratio;
+    ty = py - (py - ty) * ratio;
+    scale = newScale;
+    clamp();
+    apply();
+  }
+  function panTo(xPct, yPct){
+    var fw = frame.clientWidth, fh = frame.clientHeight;
+    if(scale === 1){ scale = 2; }
+    var targetX = fw * (xPct/100);
+    var targetY = fh * (yPct/100);
+    tx = fw/2 - targetX * scale;
+    ty = fh/2 - targetY * scale;
+    clamp();
+    apply();
+  }
+
+  $("zoomIn").addEventListener("click", function(){ zoomAt(1.4); });
+  $("zoomOut").addEventListener("click", function(){ zoomAt(1/1.4); });
+  $("zoomReset").addEventListener("click", function(){ scale=1; tx=0; ty=0; apply(); });
+
+  frame.addEventListener("wheel", function(e){
+    e.preventDefault();
+    var rect = frame.getBoundingClientRect();
+    zoomAt(e.deltaY < 0 ? 1.15 : 1/1.15, e.clientX - rect.left, e.clientY - rect.top);
+  }, { passive:false });
+
+  // drag to pan (mouse + touch)
+  var dragging = false, startX, startY, startTx, startTy, moved = false;
+  function dragStart(x,y){
+    dragging = true; moved = false;
+    startX = x; startY = y; startTx = tx; startTy = ty;
+    inner.classList.add("dragging");
+    frame.classList.add("grabbing");
+  }
+  function dragMove(x,y){
+    if(!dragging) return;
+    var dx = x - startX, dy = y - startY;
+    if(Math.abs(dx) > 3 || Math.abs(dy) > 3){ moved = true; }
+    tx = startTx + dx; ty = startTy + dy;
+    clamp();
+    apply();
+  }
+  function dragEnd(){
+    dragging = false;
+    inner.classList.remove("dragging");
+    frame.classList.remove("grabbing");
+  }
+  frame.addEventListener("mousedown", function(e){ if(e.button === 0) dragStart(e.clientX, e.clientY); });
+  window.addEventListener("mousemove", function(e){ dragMove(e.clientX, e.clientY); });
+  window.addEventListener("mouseup", dragEnd);
+  frame.addEventListener("touchstart", function(e){
+    var t = e.touches[0]; dragStart(t.clientX, t.clientY);
+  }, { passive:true });
+  frame.addEventListener("touchmove", function(e){
+    var t = e.touches[0]; dragMove(t.clientX, t.clientY);
+  }, { passive:true });
+  frame.addEventListener("touchend", dragEnd);
+  frame.addEventListener("touchcancel", dragEnd);
+
+  // clicking empty map area (not a pin, not a drag) clears selection
+  frame.addEventListener("click", function(e){
+    if(moved) return;
+    if(e.target.closest(".pin")) return;
+  });
+
+  window.addEventListener("resize", function(){ clamp(); apply(); });
+
+  // keyboard: arrow keys pan, +/- zoom, when the map has focus
+  frame.addEventListener("keydown", function(e){
+    var step = 40;
+    if(e.key === "ArrowLeft"){ tx += step; clamp(); apply(); }
+    else if(e.key === "ArrowRight"){ tx -= step; clamp(); apply(); }
+    else if(e.key === "ArrowUp"){ ty += step; clamp(); apply(); }
+    else if(e.key === "ArrowDown"){ ty -= step; clamp(); apply(); }
+    else if(e.key === "+" || e.key === "="){ zoomAt(1.3); }
+    else if(e.key === "-"){ zoomAt(1/1.3); }
+    else{ return; }
+    e.preventDefault();
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>

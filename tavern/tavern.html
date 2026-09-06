@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ハンターのさかば</title>
 <style>
+.rune{font-family:HunterX,sans-serif}.eng{display:none!important;font-family:var(--font-en)}body.tl .rune{display:none!important}body.tl .eng{display:inline!important}
+[hidden]{display:none!important}
+
 @font-face{
   font-family:'HunterX';
   src:url('assets/hunterx.otf') format('opentype');
@@ -66,11 +69,21 @@ body{
 /* ---------- registry (scroll interface) ---------- */
 #sc-registry{background:#111;}
 .reg-wrap{position:absolute; inset:0; display:flex;}
-.reg-bg{
-  position:absolute; inset:0;
-  background:url('assets/bartender.jpg') center right/cover no-repeat;
+.reg-bg{ display:none; }
+
+/* detail pane carries the backdrop, so background-size:cover is measured
+   against the visible strip rather than the full wrapper (which magnified it) */
+.detail{
+  position:relative; z-index:2; flex:1; min-width:0;
+  display:flex; align-items:flex-end; justify-content:center; padding:26px;
+  background-image:url('assets/bartender.jpg');
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:center 38%;
 }
-.reg-bg::after{content:""; position:absolute; inset:0; background:rgba(0,0,0,.12);}
+.detail::before{
+  content:""; position:absolute; inset:0; background:rgba(0,0,0,.10); pointer-events:none;
+}
 
 /* the white sheet, like the in-show list panel */
 .sheet{
@@ -86,9 +99,9 @@ body{
   display:flex; align-items:baseline; justify-content:space-between; gap:12px;
 }
 .sheet-hd .ttl{font-family:'HunterX',sans-serif; font-size:26px; line-height:1;}
-.sheet-hd .ttl .en{display:none; font-family:var(--font-en); font-size:19px; font-weight:700;}
-body.tl .sheet-hd .ttl .jp{display:none;}
-body.tl .sheet-hd .ttl .en{display:inline;}
+.sheet-hd .ttl .eng{display:none; font-family:var(--font-en); font-size:19px; font-weight:700;}
+body.tl .sheet-hd .ttl .rune{display:none;}
+body.tl .sheet-hd .ttl .eng{display:inline;}
 .sheet-hd .cnt{font-size:13px; color:#666; white-space:nowrap;}
 
 .filters{
@@ -125,9 +138,9 @@ body.tl .searchbar input{font-family:var(--font-en); font-size:15px;}
   padding:7px 20px; font-family:'HunterX',sans-serif; font-size:27px; line-height:1.5; color:#111;
   border-left:5px solid transparent;
 }
-.row .en{display:none; font-family:var(--font-en); font-size:18px; font-weight:700;}
-body.tl .row .jp{display:none;}
-body.tl .row .en{display:inline;}
+.row .eng{display:none; font-family:var(--font-en); font-size:18px; font-weight:700;}
+body.tl .row .rune{display:none;}
+body.tl .row .eng{display:inline;}
 .row .sub{
   display:block; font-family:var(--font-en); font-size:12px; color:#7a7a72; margin-top:1px; letter-spacing:.02em;
 }
@@ -142,20 +155,17 @@ body.tl .row .en{display:inline;}
 .empty{padding:26px 20px; font-size:14px; color:#888;}
 
 /* detail pane */
-.detail{
-  position:relative; z-index:2; flex:1; min-width:0;
-  display:flex; align-items:flex-end; justify-content:center; padding:26px;
-}
 .card{
+  position:relative; z-index:2;
   width:100%; max-width:380px; background:rgba(252,252,250,.96);
   border:2px solid #111; box-shadow:6px 6px 0 rgba(0,0,0,.5); padding:16px 18px 18px;
   max-height:76vh; overflow-y:auto;
 }
 .card.hide{display:none;}
 .card h2{margin:0 0 2px; font-family:'HunterX',sans-serif; font-size:30px; line-height:1.2;}
-.card h2 .en{display:none; font-family:var(--font-en); font-size:21px;}
-body.tl .card h2 .jp{display:none;}
-body.tl .card h2 .en{display:inline;}
+.card h2 .eng{display:none; font-family:var(--font-en); font-size:21px;}
+body.tl .card h2 .rune{display:none;}
+body.tl .card h2 .eng{display:inline;}
 .card .role{font-size:12px; color:#666; margin-bottom:12px; letter-spacing:.06em;}
 .card dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:13px;}
 .card dt{color:#7a7a72; white-space:nowrap;}
@@ -185,11 +195,11 @@ body.tl .card h2 .en{display:inline;}
   background:#111; color:#fff; padding:12px 16px; display:flex; justify-content:space-between;
   align-items:center; font-size:14px; font-weight:700; letter-spacing:.06em;
 }
-.ov-hd .jp{font-family:'HunterX',sans-serif; font-size:19px;}
+.ov-hd .rune{font-family:'HunterX',sans-serif; font-size:19px;}
 .ov-hd button{background:none; border:none; color:#fff; font-size:19px; cursor:pointer; line-height:1;}
 .ov-body{padding:18px 18px 22px;}
 .ov-lead{margin:0 0 16px; font-size:13px; color:#555; line-height:1.7;}
-.ov-lead .jp{font-family:'HunterX',sans-serif; font-size:17px; color:#222;}
+.ov-lead .rune{font-family:'HunterX',sans-serif; font-size:17px; color:#222;}
 .g2{display:grid; grid-template-columns:1fr 1fr; gap:12px 14px;}
 .ov-body label{display:flex; flex-direction:column; gap:5px; font-size:12px; font-weight:700; color:#333;}
 .ov-body label.full, .g2 label.full{grid-column:1/-1;}
@@ -237,11 +247,12 @@ body.tl .card h2 .en{display:inline;}
 /* mobile */
 @media (max-width:860px){
   .reg-wrap{flex-direction:column;}
+  .reg-bg{background-position:center 30%;}
   .sheet{width:100%; height:62%; border-right:none; border-bottom:2px solid #b9b9b3; box-shadow:0 6px 18px rgba(0,0,0,.5);}
   .detail{flex:1; padding:12px; align-items:stretch;}
   .card{max-width:none; max-height:none; overflow-y:auto;}
   .row{font-size:23px; padding:8px 16px;}
-  body.tl .row .en{font-size:16px;}
+  body.tl .row .eng{font-size:16px;}
   .sheet-hd{padding:12px 16px 8px;}
   .sheet-hd .ttl{font-size:21px;}
   .sheet-hd .cnt{display:none;}
@@ -254,11 +265,39 @@ body.tl .card h2 .en{display:inline;}
   .sheet{width:56%; height:100%;}
   .reg-wrap{flex-direction:row;}
 }
+body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
+.sheet,.ov-panel{background:#fff;box-shadow:none;border-width:1px}
+.sheet-hd{border-bottom:2px solid #1a2b56}
+.card{background:#fff;border:1px solid #1a2b56;border-top:3px solid #c9a24c;box-shadow:none}
+.card .note,.card dl,.ov-lead,.ov-body input,.ov-body select,.ov-body textarea{font-size:18px}
+.ov-body label,.filters button,.row .sub,.hud button,.ov-note{font-size:14px}
+.hud button{border-width:1px;box-shadow:none}.filters{flex-wrap:wrap;overflow:visible}
+.filters button{padding:8px 10px}.row.sel{background:#f6eed6}
+.ov-hd{background:#1a2b56}.ov-ok{border:1px solid #c9a24c;background:#f6eed6;color:#000}
+.ov-body input,.ov-body select,.g2>*,.fc-fields{min-width:0;max-width:100%}
+#accessGate{position:fixed;inset:0;z-index:1000;background:#fff;display:grid;place-items:center;padding:24px}
+#accessGate>div{max-width:500px}#accessGate button{display:block;margin-top:20px}
+#reviewOverlay{width:min(1100px,calc(100% - 24px));max-height:calc(100% - 24px);padding:20px;background:#fff;color:#000;border:1px solid #1a2b56;font:18px var(--font-en)}
+#reviewOverlay::backdrop{background:rgba(0,0,0,.6)}
+.review-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:2px solid #1a2b56}
+.review-head h2{font-size:23px}.review-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px}
+#reviewList button{display:block;width:100%;text-align:left;margin:6px 0}
+#reviewOverlay button,#accessGate button{font:inherit;background:#fff;border:1px solid #1a2b56;padding:9px 14px;cursor:pointer}
+#reviewSheet{min-width:0}#reviewSheet dl{margin:0 0 22px}#reviewSheet dt{font-size:14px;margin-top:16px;color:#1a2b56}#reviewSheet dd{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+#reviewSheet textarea{display:block;width:100%;font:inherit;margin:8px 0;resize:vertical}
+.review-actions{display:flex;gap:12px}.review-actions button:first-child{background:#1a2b56!important;color:#fff}
+.review-actions button:last-child{color:#a32115}#reviewFeedback{padding:12px;border-left:3px solid #c9a24c;white-space:pre-wrap;overflow-wrap:anywhere}
+#reviewMessage{overflow-wrap:anywhere}#sc-registry .hud{position:static}
+@media(max-width:860px){.sheet-hd{padding-top:48px}.sheet{height:65%;min-height:0}.detail{min-height:0}.card{max-height:100%}.ov-panel{margin:0}.ov-body{padding:14px}.ov-foot>span{flex-wrap:wrap}.review-layout{grid-template-columns:minmax(0,1fr)}#reviewList{max-height:160px;overflow:auto}}
+
 </style>
+<script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
+<div id="accessGate" hidden><div><p id="accessMessage">Verifying access…</p><a href="../index.html" target="_top">Return to the main site</a><button id="retryAccess">Retry</button></div></div>
+<dialog id="reviewOverlay"><div class="review-head"><h2><span class="rune">とうろく しんさ</span><span class="eng">Submission Review</span></h2><button id="reviewClose">Close</button></div><p id="reviewMessage" role="status"></p><div class="review-layout"><div id="reviewList"></div><section id="reviewSheet"></section></div></dialog>
 <div id="stage">
 
   <!-- 1. splash card -->
@@ -272,7 +311,7 @@ body.tl .card h2 .en{display:inline;}
       <source src="assets/doors.mp4" type="video/mp4">
     </video>
     <div class="tap" id="tapVideo" style="display:none;">
-      <span class="jp">クリック</span><span class="en" style="display:none;">CLICK TO CONTINUE</span>
+      <span class="rune">クリック</span><span class="eng" style="display:none;">CLICK TO CONTINUE</span>
     </div>
   </div>
 
@@ -280,7 +319,7 @@ body.tl .card h2 .en{display:inline;}
   <div class="scene" id="sc-bar">
     <img src="assets/bar.jpg" alt="The bar">
     <div class="tap">
-      <span class="jp">クリック</span><span class="en" style="display:none;">CLICK TO CONTINUE</span>
+      <span class="rune">クリック</span><span class="eng" style="display:none;">CLICK TO CONTINUE</span>
     </div>
   </div>
 
@@ -292,19 +331,20 @@ body.tl .card h2 .en{display:inline;}
       <div class="sheet">
         <div class="sheet-hd">
           <span class="ttl">
-            <span class="jp">ハンターめいぼ</span>
-            <span class="en">HUNTER REGISTRY</span>
+            <span class="rune">ハンターめいぼ</span>
+            <span class="eng">HUNTER REGISTRY</span>
           </span>
           <span class="cnt" id="count">—</span>
         </div>
 
         <div class="filters" id="filters">
-          <button class="on" data-f="all"><span class="jp">ぜんぶ</span><span class="en" style="display:none;">All</span></button>
-          <button data-f="hunter"><span class="jp">ハンター</span><span class="en" style="display:none;">Hunters</span></button>
-          <button data-f="topic"><span class="jp">こうもく</span><span class="en" style="display:none;">Topics</span></button>
+          <button class="on" data-f="all"><span class="rune">ぜんぶ</span><span class="eng" style="display:none;">All</span></button>
+          <button data-f="hunter"><span class="rune">ハンター</span><span class="eng" style="display:none;">Hunters</span></button>
+          <button data-f="topic"><span class="rune">こうもく</span><span class="eng" style="display:none;">Topics</span></button>
           <button id="mine" style="margin-left:auto; background:#111; color:#fff; border-color:#111;">
-            <span class="jp">じぶんの とうろく</span><span class="en" style="display:none;">My Entry</span>
+            <span class="rune">じぶんの とうろく</span><span class="eng" style="display:none;">My Entry</span>
           </button>
+          <button id="reviewBtn" hidden><span class="rune">しんさ</span><span class="eng">Review</span></button>
         </div>
 
         <div class="searchbar">
@@ -324,13 +364,13 @@ body.tl .card h2 .en{display:inline;}
   <div id="sheetOverlay" aria-hidden="true">
     <div class="ov-panel" role="dialog" aria-label="My registry entry">
       <div class="ov-hd">
-        <span><span class="jp">じぶんの とうろく</span><span class="en" style="display:none;">MY REGISTRY ENTRY</span></span>
+        <span><span class="rune">じぶんの とうろく</span><span class="eng" style="display:none;">MY REGISTRY ENTRY</span></span>
         <button id="ovClose" aria-label="Close">✕</button>
       </div>
       <div class="ov-body">
         <p class="ov-lead">
-          <span class="jp">この らん は ハンターめいぼ に のります。ほかの ハンター が よめます。</span>
-          <span class="en" style="display:none;">What you enter here appears in the Hunter Registry above, readable by every other Hunter.</span>
+          <span class="rune">この らん は ハンターめいぼ に のります。ほかの ハンター が よめます。</span>
+          <span class="eng" style="display:none;">What you enter here appears in the Hunter Registry above, readable by every other Hunter.</span>
         </p>
 
         <div class="f full" id="pickerWrap" style="display:none;">
@@ -339,6 +379,7 @@ body.tl .card h2 .en{display:inline;}
           </label>
         </div>
 
+        <p id="reviewFeedback" hidden role="status"></p>
         <div class="fc-row">
           <div class="fc-box" id="fcBox"><span class="fc-ph">PHOTO</span></div>
           <div class="fc-fields">
@@ -350,6 +391,7 @@ body.tl .card h2 .en{display:inline;}
         <div class="g2">
           <label>Name (rune label)<input id="sName" placeholder="クロガネ・レン"></label>
           <label>Name (readable)<input id="sNameEn" placeholder="Ren Kurogane"></label>
+          <label>Alias<input id="sAlias"></label><label>Occupation<input id="sOccupation"></label><label>Affiliation<input id="sAffiliation"></label>
           <label>Age<input id="sAge" type="number" min="0" max="200"></label>
           <label>Height (cm)<input id="sHeight" type="number" min="0" max="300"></label>
           <label>License class
@@ -386,9 +428,9 @@ body.tl .card h2 .en{display:inline;}
 
         <div id="mcBox" style="display:none;">
           <div class="norec">
-            <b><span class="jp">こせき が みつかりません</span><span class="en" style="display:none;">NO CIVIL RECORD FOUND</span></b><br>
-            <span class="jp">りゅうせいがい の じゅうみん は とうろく されて いません。</span>
-            <span class="en" style="display:none;">Meteor City residents are unregistered, so nothing can be retrieved.</span>
+            <b><span class="rune">こせき が みつかりません</span><span class="eng" style="display:none;">NO CIVIL RECORD FOUND</span></b><br>
+            <span class="rune">りゅうせいがい の じゅうみん は とうろく されて いません。</span>
+            <span class="eng" style="display:none;">Meteor City residents are unregistered, so nothing can be retrieved.</span>
           </div>
           <div class="ooc">
             <span class="ooc-tag">STAFF USE — OOC</span>
@@ -404,8 +446,8 @@ body.tl .card h2 .en{display:inline;}
         <div class="ov-foot">
           <span class="ov-note">Edits are reviewed by staff before they appear in the registry.</span>
           <span style="display:flex; gap:8px;">
-            <button id="ovSaveDraft" class="secondary"><span class="jp">したがき</span><span class="en" style="display:none;">Save Draft</span></button>
-            <button id="ovSubmit"><span class="jp">しんさに だす</span><span class="en" style="display:none;">Submit for Review</span></button>
+            <button id="ovSaveDraft" class="secondary"><span class="rune">したがき</span><span class="eng" style="display:none;">Save Draft</span></button>
+            <button id="ovSubmit"><span class="rune">しんさに だす</span><span class="eng" style="display:none;">Submit for Review</span></button>
           </span>
         </div>
         <div class="ov-ok" id="ovOk"></div>
@@ -428,10 +470,12 @@ body.tl .card h2 .en{display:inline;}
   // ---------- Supabase config ----------
   // Same project as index.html. Fill these in the same way; leave them
   // as-is to keep using the built-in sample registry entries below.
-  var SUPABASE_URL = "YOUR_SUPABASE_URL";
-  var SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+  var SUPABASE_URL = window.GXB_CONFIG.supabaseUrl;
+  var SUPABASE_ANON_KEY = window.GXB_CONFIG.supabaseAnonKey;
   var LIVE = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
   var sb = LIVE ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+  if(LIVE) document.getElementById("accessGate").hidden=false;
+  var currentRank = 0, allowed = !LIVE;
   var currentUser = null; // set once we know who's signed in (LIVE mode only)
 
   /* =========================================================
@@ -440,7 +484,7 @@ body.tl .card h2 .en{display:inline;}
      ========================================================= */
   var TOPICS = [
     {type:"topic",  jp:"グリードアイランド", en:"Greed Island",
-     meta:{"種別":"ゲーム / Game","じょうたい":"Active"},
+     meta:{"しゅべつ":"ゲーム / Game","じょうたい":"Active"},
      note:"A Nen-made game cartridge. Entry is limited and expensive; most listings here concern card trades and party recruitment."},
     {type:"topic",  jp:"ハンターしけん", en:"Hunter Exam",
      meta:{"かい":"287th","じょうたい":"Open"},
@@ -483,11 +527,13 @@ body.tl .card h2 .en{display:inline;}
     meteor:"Meteor City", other:"Elsewhere"
   };
 
+  function esc(value){ return String(value == null ? "" : value).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+  function dual(kana,english){return '<span class="rune">'+esc(kana)+'</span><span class="eng">'+esc(english)+'</span>';}
   function rowToEntry(row){
     return {
       type:"hunter",
       id: row.id,
-      jp: row.name_rune || row.name_en,
+      jp: row.name_rune || "なまえ なし",
       en: row.name_en,
       meta:{
         "めんきょ": row.license_class || "—",
@@ -499,10 +545,10 @@ body.tl .card h2 .en{display:inline;}
   }
 
   async function loadLiveRegistry(){
-    if(!LIVE) return;
+    if(!LIVE || !allowed) return;
     try{
       var res = await sb.from("hunter_registry").select("*").order("name_en");
-      if(res.error){ console.warn("registry query failed:", res.error); return; }
+      if(res.error){ console.warn("registry query failed:", res.error); listEl.textContent="Could not load registry: "+res.error.message; return; }
       ENTRIES = TOPICS.concat((res.data || []).map(rowToEntry));
       render();
     }catch(e){
@@ -513,12 +559,36 @@ body.tl .card h2 .en{display:inline;}
   var $ = function(id){ return document.getElementById(id); };
   var body = document.body;
 
+  function lockTavern(message){
+    allowed=false; currentRank=0;
+    $("accessGate").hidden=false;
+    $("accessMessage").textContent=message;
+    $("reviewBtn").hidden=true;
+    $("sheetOverlay").classList.remove("on");
+    $("reviewOverlay").close();
+    ENTRIES=TOPICS.slice(); render(); cardEl.textContent="";
+  }
+  async function checkAccess(){
+    if(!LIVE) return;
+    try{
+      var userRes=await sb.auth.getUser();
+      currentUser=userRes.data && userRes.data.user;
+      if(userRes.error || !currentUser) throw new Error("Sign in with Discord on the main site.");
+      var sync=await sb.functions.invoke("sync-roles",{body:{}});
+      if(sync.error) throw sync.error;
+      if(!sync.data || sync.data.error) throw new Error(sync.data && sync.data.error || "Could not verify access.");
+      currentRank=sync.data.rank;
+      allowed=sync.data.is_hunter === true || currentRank>=6;
+      if(!allowed) throw new Error("Hunter or Admin access is required.");
+      $("accessGate").hidden=true;
+      $("reviewBtn").hidden=currentRank<6;
+      if(step===3) loadLiveRegistry();
+    }catch(err){ lockTavern(err.message); }
+  }
   if(LIVE){
-    sb.auth.getSession().then(function(res){
-      currentUser = res.data && res.data.session && res.data.session.user;
-    });
-    sb.auth.onAuthStateChange(function(_e, session){
-      currentUser = session ? session.user : null;
+    sb.auth.onAuthStateChange(function(event,session){
+      if(!session){ setTimeout(function(){currentUser=null;lockTavern("Sign in with Discord on the main site.");},0); }
+      else if(event==="INITIAL_SESSION" || event==="SIGNED_IN") setTimeout(checkAccess,0);
     });
   }
 
@@ -547,7 +617,7 @@ body.tl .card h2 .en{display:inline;}
   }
 
   function tell(scene){
-    try{ if(window.parent && window.parent !== window){ window.parent.postMessage({t:"tavern", scene:scene}, "*"); } }catch(err){}
+    try{ if(window.parent && window.parent !== window){ window.parent.postMessage({t:"tavern", scene:scene}, window.location.origin); } }catch(err){}
   }
   tell("intro");
 
@@ -599,7 +669,7 @@ body.tl .card h2 .en{display:inline;}
 
   // clicks advance: video-still -> bar -> registry (hard cuts, no effects)
   function advance(){
-    if(!awaiting) return;
+    if(!allowed || !awaiting) return;
     if(step === 1){
       awaiting = false;
       showScene("bar", false);       // hard cut
@@ -637,6 +707,7 @@ body.tl .card h2 .en{display:inline;}
   // skip straight to the registry
   $("skip").style.display = "inline-block";
   $("skip").addEventListener("click", function(){
+    if(!allowed) return;
     video.pause();
     flash.classList.remove("on");
     showScene("registry", false);
@@ -649,7 +720,9 @@ body.tl .card h2 .en{display:inline;}
   /* ---------------- translate ---------------- */
   $("tl").addEventListener("click", function(){
     var on = body.classList.toggle("tl");
-    var jps = document.querySelectorAll(".jp"), ens = document.querySelectorAll(".en");
+    $("tl").setAttribute("aria-pressed",String(on));
+    $("q").placeholder=on ? "Search" : "けんさく";
+    var jps = document.querySelectorAll(".rune"), ens = document.querySelectorAll(".eng");
     var i;
     for(i=0;i<jps.length;i++){ jps[i].style.display = on ? "none" : ""; }
     for(i=0;i<ens.length;i++){ ens[i].style.display = on ? "inline" : "none"; }
@@ -673,24 +746,24 @@ body.tl .card h2 .en{display:inline;}
       if(!matches(e)) continue;
       if(filter === "all" && e.type !== lastType){
         lastType = e.type;
-        rows.push('<div class="row head">' + (e.type === "hunter" ? "HUNTERS" : "TOPICS") + '</div>');
+        rows.push('<div class="row head">' + (e.type === "hunter" ? dual("ハンター","HUNTERS") : dual("こうもく","TOPICS")) + '</div>');
       }
       shown++;
       var sub = [];
-      for(var k in e.meta){ sub.push(e.meta[k]); }
+      for(var k in e.meta){ sub.push(esc(e.meta[k])); }
       rows.push(
         '<button class="row' + (i === selected ? ' sel' : '') + '" data-i="' + i + '">' +
-          '<span class="jp">' + e.jp + '</span>' +
-          '<span class="en"' + (body.classList.contains("tl") ? '' : ' style="display:none"') + '>' + e.en + '</span>' +
+          '<span class="rune">' + esc(e.jp) + '</span>' +
+          '<span class="eng"' + (body.classList.contains("tl") ? '' : ' style="display:none"') + '>' + esc(e.en) + '</span>' +
           '<span class="sub">' + sub.join(" · ") + '</span>' +
         '</button>'
       );
     }
-    listEl.innerHTML = rows.length ? rows.join("") : '<div class="empty">みつかりません / No matches</div>';
+    listEl.innerHTML = rows.length ? rows.join("") : '<div class="empty"><span class="rune">みつかりません</span><span class="eng">No matches</span></div>';
     countEl.textContent = shown + " / " + ENTRIES.length;
     // keep jp/en visibility consistent after re-render
     if(body.classList.contains("tl")){
-      var jps = listEl.querySelectorAll(".jp");
+      var jps = listEl.querySelectorAll(".rune");
       for(var j=0;j<jps.length;j++){ jps[j].style.display = "none"; }
     }
   }
@@ -698,13 +771,13 @@ body.tl .card h2 .en{display:inline;}
   function showCard(i){
     var e = ENTRIES[i];
     var dl = "";
-    for(var k in e.meta){ dl += "<dt>" + k + "</dt><dd>" + e.meta[k] + "</dd>"; }
+    for(var k in e.meta){ dl += "<dt>" + esc(k) + "</dt><dd>" + esc(e.meta[k]) + "</dd>"; }
     cardEl.className = "card";
     cardEl.innerHTML =
-      '<h2><span class="jp">' + e.jp + '</span><span class="en"' + (body.classList.contains("tl") ? '' : ' style="display:none"') + '>' + e.en + '</span></h2>' +
-      '<div class="role">' + (e.type === "hunter" ? "REGISTERED HUNTER" : "TAVERN TOPIC") + '</div>' +
+      '<h2><span class="rune">' + esc(e.jp) + '</span><span class="eng"' + (body.classList.contains("tl") ? '' : ' style="display:none"') + '>' + esc(e.en) + '</span></h2>' +
+      '<div class="role">' + (e.type === "hunter" ? dual("とうろく ハンター","REGISTERED HUNTER") : dual("さかば の こうもく","TAVERN TOPIC")) + '</div>' +
       '<dl>' + dl + '</dl>' +
-      '<div class="note">' + e.note + '</div>';
+      '<div class="note">' + esc(e.note) + '</div>';
   }
 
   listEl.addEventListener("click", function(e){
@@ -719,8 +792,8 @@ body.tl .card h2 .en{display:inline;}
 
   $("filters").addEventListener("click", function(e){
     var b = e.target.closest("button");
-    if(!b) return;
-    var all = this.querySelectorAll("button");
+    if(!b || !b.hasAttribute("data-f")) return;
+    var all = this.querySelectorAll("button[data-f]");
     for(var i=0;i<all.length;i++){ all[i].classList.remove("on"); }
     b.classList.add("on");
     filter = b.getAttribute("data-f");
@@ -734,6 +807,7 @@ body.tl .card h2 .en{display:inline;}
   var myCharacters = [];
 
   async function openOv(){
+    if(!allowed) return;
     tell("expand");
     ov.classList.add("on"); ov.setAttribute("aria-hidden","false");
     $("ovOk").classList.remove("on");
@@ -742,7 +816,7 @@ body.tl .card h2 .en{display:inline;}
       var res = await sb.auth.getUser();
       currentUser = res.data && res.data.user;
     }
-    if(currentUser){ await loadMyCharacters(); }
+    if(currentUser){ try{await loadMyCharacters();}catch(err){$("ovOk").textContent=err.message;$("ovOk").classList.add("on");} }
     else{
       $("pickerWrap").style.display = "none";
       $("ovOk").textContent = "Not signed in — sign in on the main site, then reopen the Tavern.";
@@ -776,6 +850,8 @@ body.tl .card h2 .en{display:inline;}
 
   function clearForm(){
     editingId = null;
+    $("sAlias").value=""; $("sOccupation").value=""; $("sAffiliation").value="";
+    $("reviewFeedback").hidden=true;
     $("fcUrl").value = ""; $("fcUrl").dispatchEvent(new Event("input"));
     $("fcCredit").value = "";
     $("sName").value = ""; $("sNameEn").value = "";
@@ -788,6 +864,7 @@ body.tl .card h2 .en{display:inline;}
 
   function fillForm(row, ooc){
     editingId = row.id;
+    $("sAlias").value=row.alias || ""; $("sOccupation").value=row.occupation || ""; $("sAffiliation").value=row.affiliation || "";
     $("sName").value = row.name_rune || "";
     $("sNameEn").value = row.name_en || "";
     $("sAge").value = row.age || "";
@@ -798,6 +875,9 @@ body.tl .card h2 .en{display:inline;}
     $("fcCredit").value = row.faceclaim_credit || "";
     $("sOrigin").value = row.origin || ""; $("sOrigin").dispatchEvent(new Event("change"));
     $("sBio").value = row.background || "";
+    ooc = ooc || {};
+    $("reviewFeedback").textContent = row.review_note ? "Admin note: " + row.review_note : "";
+    $("reviewFeedback").hidden = !row.review_note;
     if(ooc){
       $("mcWho").value = ooc.who_is_this || "";
       $("mcBio").value = ooc.background_ooc || "";
@@ -809,12 +889,13 @@ body.tl .card h2 .en{display:inline;}
   async function loadMyCharacters(preserveId){
     if(!currentUser) return;
     var res = await sb.from("characters").select("*").eq("owner_id", currentUser.id).order("created_at");
+    if(res.error) throw res.error;
     myCharacters = res.data || [];
     var picker = $("sPicker");
     var opts = ['<option value="">+ New character</option>'];
     myCharacters.forEach(function(c){
       opts.push('<option value="' + c.id + '"' + (c.id === preserveId ? ' selected' : '') + '>' +
-        (c.name_en || "Untitled") + ' — ' + c.status + '</option>');
+        esc(c.name_en || "Untitled") + ' — ' + c.status + '</option>');
     });
     picker.innerHTML = opts.join("");
     $("pickerWrap").style.display = "block";
@@ -852,6 +933,7 @@ body.tl .card h2 .en{display:inline;}
     return {
       name_rune: $("sName").value.trim(),
       name_en: $("sNameEn").value.trim(),
+      alias:$("sAlias").value.trim(),occupation:$("sOccupation").value.trim(),affiliation:$("sAffiliation").value.trim(),
       age: $("sAge").value ? parseInt($("sAge").value, 10) : null,
       height_cm: $("sHeight").value ? parseInt($("sHeight").value, 10) : null,
       faceclaim_url: $("fcUrl").value.trim(),
@@ -873,38 +955,30 @@ body.tl .card h2 .en{display:inline;}
       return;
     }
     if(!LIVE){
-      ok.textContent = "Saved locally — connect Supabase (see SUPABASE_SETUP.md) for this to persist.";
+      ok.textContent = "Preview only — this entry has not been saved.";
       ok.classList.add("on");
       return;
     }
-    if(!currentUser){
+    if(!allowed || !currentUser){
       ok.textContent = "Not signed in — sign in on the main site, then reopen the Tavern.";
       ok.classList.add("on");
       return;
     }
 
+    if($("sName").value.trim() && !/^[\u3040-\u30ff\u3000\s]+$/.test($("sName").value.trim())){
+      ok.textContent="Use hiragana or katakana for the rune name.";ok.classList.add("on");return;
+    }
     var payload = collectPayload(status);
-    var charRes = editingId
-      ? await sb.from("characters").update(payload).eq("id", editingId).select().maybeSingle()
-      : await sb.from("characters").insert(payload).select().maybeSingle();
-
-    if(charRes.error){
-      ok.textContent = "Could not save: " + charRes.error.message;
-      ok.classList.add("on");
-      return;
+    var ooc = $("sOrigin").value === "meteor" ? {
+      who_is_this:$("mcWho").value.trim(),background_ooc:$("mcBio").value.trim(),
+      from_ooc:$("mcFrom").value.trim(),ties_ooc:$("mcTies").value.trim()
+    } : {};
+    var charRes = await sb.rpc("save_character",{character_uuid:editingId,sheet_data:payload,ooc_data:ooc});
+    if(charRes.error || !charRes.data){
+      ok.textContent="Could not save: "+(charRes.error ? charRes.error.message : "No record returned");
+      ok.classList.add("on"); return;
     }
-
-    var savedId = charRes.data.id;
-
-    if($("sOrigin").value === "meteor"){
-      await sb.from("character_ooc").upsert({
-        character_id: savedId,
-        who_is_this: $("mcWho").value.trim(),
-        background_ooc: $("mcBio").value.trim(),
-        from_ooc: $("mcFrom").value.trim(),
-        ties_ooc: $("mcTies").value.trim()
-      });
-    }
+    var savedId=charRes.data.id;
 
     ok.textContent = status === "pending"
       ? "Submitted for review. Staff will approve or return it."
@@ -915,9 +989,68 @@ body.tl .card h2 .en{display:inline;}
     loadLiveRegistry(); // in case an approval-cycle change just affected what others can see
   }
 
-  $("ovSaveDraft").addEventListener("click", function(){ saveEntry("draft"); });
-  $("ovSubmit").addEventListener("click", function(){ saveEntry("pending"); });
+  var saving=false;
+  async function saveWithFeedback(status){
+    if(saving) return; saving=true;
+    $("ovSaveDraft").disabled=true;$("ovSubmit").disabled=true;
+    try{await saveEntry(status);}catch(err){$("ovOk").textContent="Could not save: "+err.message;$("ovOk").classList.add("on");}
+    finally{saving=false;$("ovSaveDraft").disabled=false;$("ovSubmit").disabled=false;}
+  }
+  $("ovSaveDraft").addEventListener("click", function(){saveWithFeedback("draft");});
+  $("ovSubmit").addEventListener("click", function(){saveWithFeedback("pending");});
 
+  $("retryAccess").addEventListener("click",checkAccess);
+  var pendingSheets=[], selectedReview=null;
+  $("reviewClose").addEventListener("click",function(){ $("reviewOverlay").close(); tell("collapse"); });
+  $("reviewOverlay").addEventListener("cancel",function(){tell("collapse");});
+  $("reviewBtn").addEventListener("click",async function(){
+    if(!allowed || currentRank<6) return;
+    $("reviewOverlay").showModal(); tell("expand"); await loadPending();
+  });
+  async function loadPending(){
+    $("reviewMessage").textContent="Loading pending submissions…";
+    $("reviewSheet").replaceChildren(); selectedReview=null;
+    var res=await sb.from("characters").select("*").eq("status","pending").order("updated_at");
+    if(res.error){$("reviewMessage").textContent=res.error.message;return;}
+    pendingSheets=res.data || [];
+    $("reviewMessage").textContent=pendingSheets.length ? pendingSheets.length+" pending" : "No pending submissions.";
+    $("reviewList").replaceChildren();
+    pendingSheets.forEach(function(row){
+      var button=document.createElement("button");button.textContent=row.name_en;
+      button.addEventListener("click",function(){openReview(row);}); $("reviewList").appendChild(button);
+    });
+  }
+  async function openReview(row){
+    selectedReview=row;
+    var res=await sb.from("character_ooc").select("*").eq("character_id",row.id).maybeSingle();
+    if(selectedReview !== row) return;
+    if(res.error){$("reviewMessage").textContent=res.error.message;return;}
+    var pane=$("reviewSheet");pane.replaceChildren();
+    var heading=document.createElement("h3"); heading.textContent=row.name_en;pane.appendChild(heading);
+    var fields={owner_id:"Account",name_rune:"Kana name",name_en:"Name",alias:"Alias",age:"Age",height_cm:"Height (cm)",faceclaim_url:"Faceclaim URL",faceclaim_credit:"Image credit (OOC)",origin:"Origin",license_class:"License class",nen_category:"Nen category",background:"Background",occupation:"Occupation",affiliation:"Affiliation",review_note:"Previous review note"};
+    function field(label,value){var dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=value || "—";dl.append(dt,dd);}
+    var dl=document.createElement("dl");pane.appendChild(dl);
+    Object.keys(fields).forEach(function(key){field(fields[key],row[key]);});
+    if(row.origin === "meteor"){
+      var ooc=res.data || {};
+      field("ADMIN ONLY — Who is this character?",ooc.who_is_this);field("Background (OOC)",ooc.background_ooc);field("Origin (OOC)",ooc.from_ooc);field("Ties (OOC)",ooc.ties_ooc);
+    }
+    var label=document.createElement("label");label.textContent="Note to player (required for rejection)";
+    var note=document.createElement("textarea");note.rows=4;label.appendChild(note);pane.appendChild(label);
+    var actions=document.createElement("div");actions.className="review-actions";pane.appendChild(actions);
+    ["approved","rejected"].forEach(function(decision){
+      var button=document.createElement("button");button.textContent=decision === "approved" ? "Approve" : "Reject";
+      actions.appendChild(button);button.addEventListener("click",async function(){
+        if(decision === "rejected" && !note.value.trim()){note.focus();$("reviewMessage").textContent="Write a rejection note.";return;}
+        actions.querySelectorAll("button").forEach(function(b){b.disabled=true;});
+        try{
+          var result=await sb.rpc("review_character",{character_uuid:row.id,expected_updated_at:row.updated_at,decision:decision,note:note.value.trim()});
+          if(result.error) throw result.error;
+          await loadPending();await loadLiveRegistry();
+        }catch(err){$("reviewMessage").textContent=err.message;actions.querySelectorAll("button").forEach(function(b){b.disabled=false;});}
+      });
+    });
+  }
   render();
 })();
 </script>
