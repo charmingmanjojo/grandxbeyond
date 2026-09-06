@@ -472,7 +472,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
   // as-is to keep using the built-in sample registry entries below.
   var SUPABASE_URL = window.GXB_CONFIG.supabaseUrl;
   var SUPABASE_ANON_KEY = window.GXB_CONFIG.supabaseAnonKey;
-  var LIVE = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
+  var LIVE = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY" && SUPABASE_ANON_KEY.length > 20;
   var sb = LIVE ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
   if(LIVE) document.getElementById("accessGate").hidden=false;
   var currentRank = 0, allowed = !LIVE;

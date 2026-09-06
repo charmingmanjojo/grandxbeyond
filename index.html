@@ -523,6 +523,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
  .auth-body{padding:18px 14px}.sheet-foot{flex-wrap:wrap}
  .card-flip{max-width:100%}.boardnav-inner{gap:6px}
 }
+.card-flip.inactive{filter:grayscale(1);opacity:.65}
 </style>
 </head>
 <body>
@@ -623,7 +624,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
             </div>
           </button>
           <div class="card-hint"><span class="rune">クリックで うらめん</span><span class="eng">Click the card to flip it</span></div>
-          <div class="card-caption" id="cardCaption"><span class="rune">めんきょばんごう は アカウント ごとに はっこう されます</span><span class="eng">A license number is issued per account</span></div>
+          <div class="card-caption" id="cardCaption"><span class="rune">ハンターきょうかい の ロール で カード が ゆうこう に なります</span><span class="eng">The Hunter Association role activates your permanent card</span></div>
         </div>
       </div>
     </section>
@@ -862,7 +863,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   // at the bottom of the page keep working exactly as before.
   var SUPABASE_URL = window.GXB_CONFIG.supabaseUrl;
   var SUPABASE_ANON_KEY = window.GXB_CONFIG.supabaseAnonKey;
-  var LIVE = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
+  var LIVE = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY" && SUPABASE_ANON_KEY.length > 20;
   var sb = LIVE ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
   // ---------- state ----------
@@ -880,7 +881,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
     }
     return s;
   }
-  function groupNum(n){ return n.replace(/(\d{4})(?=\d)/g, "$1 "); }
+  function groupNum(n){ return n ? n.replace(/(\d{4})(?=\d)/g, "$1 ") : "—"; }
 
   // ---------- barcode ----------
   (function(){
@@ -899,18 +900,22 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
 
   function renderCard(){
     var digits = $("cardDigits"), name = $("cardName"), lines = $("cardLines"), cap = $("cardCaption");
-    if(state.account){
+    cardFlip.classList.toggle("inactive", !!(state.account && state.account.licenseStatus === "inactive"));
+    if(state.account && state.account.license){
       digits.textContent = state.account.license;
       digits.classList.remove("empty");
       name.textContent = state.account.name || "とうろくずみ";
       lines.textContent = "ハンターきょうかい はっこう こうにん さいはっこう ふか とりあつかい ちゅうい しつぶつ の さい は ただちに とどけでる こと";
       cap.innerHTML = '<span class="rune">この ばんごう は アカウント に ひもづいて います</span><span class="eng">This number is bound to your account</span>';
+      if(state.account.licenseStatus === "inactive"){
+        cap.innerHTML='<span class="rune">この カード は むこう です。ばんごう は ほぞん されています。</span><span class="eng">Card inactive — your permanent number is retained.</span>';
+      }
     } else {
       digits.textContent = "みはっこう";
       digits.classList.add("empty");
       name.textContent = "みとうろく";
       lines.textContent = "";
-      cap.innerHTML = '<span class="rune">めんきょばんごう は アカウント ごとに はっこう されます</span><span class="eng">A license number is issued per account</span>';
+      cap.innerHTML = '<span class="rune">ハンターきょうかい の ロール で カード が ゆうこう に なります</span><span class="eng">The Hunter Association role activates your permanent card</span>';
     }
   }
 
@@ -1065,20 +1070,13 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
       if(!user) return;
       var prof = await fetchProfileWithRetry(user.id);
       if(!prof) throw new Error("Profile missing. Check the auth.users profile trigger.");
-      for(var attempt=0; !prof.license_number && attempt<3; attempt++){
-        var upd = await sb.from("profiles").update({license_number:makeLicenseNumber()})
-          .eq("id",user.id).is("license_number",null).select().maybeSingle();
-        if(upd.error && upd.error.code !== "23505") throw upd.error;
-        prof = await fetchProfileWithRetry(user.id);
-      }
-      if(!prof || !prof.license_number) throw new Error("Could not issue license. Please retry.");
-      if(generation !== authGeneration) return;
-      state.account = {name:prof.display_name || "Hunter",line:"discord",license:prof.license_number};
-      applyAccount();
       var syncRes = await sb.functions.invoke("sync-roles", {body:{}});
       if(syncRes.error) throw syncRes.error;
       if(!syncRes.data || syncRes.data.error) throw new Error(syncRes.data && syncRes.data.error || "Empty role sync response");
       if(generation !== authGeneration) return;
+      state.account = {name:prof.display_name || "Hunter",line:"discord",
+        license:syncRes.data.license_number,licenseStatus:syncRes.data.license_status};
+      applyAccount();
       setHunter(syncRes.data.is_hunter === true || syncRes.data.rank >= 6);
       $("loginErr").classList.remove("show");
     }catch(err){
