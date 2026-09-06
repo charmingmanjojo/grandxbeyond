@@ -208,6 +208,26 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
 @media(max-width:900px){.map-shell{grid-template-columns:minmax(0,1fr)}.map-stage{border-right:0}}
 @media(max-width:520px){main{padding:20px 16px}.map-hint{display:none}.masthead-inner{padding:16px}.map-controls{right:6px;bottom:6px;gap:3px}.map-controls button{width:32px;height:32px}}
 
+
+/* Vector territories stay registered to the original image at every zoom. */
+#regionLayer{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.region-area{fill:transparent;stroke:transparent;stroke-width:1.2;pointer-events:all;cursor:pointer;transition:fill .16s,stroke .16s;stroke-linejoin:round}
+.region-area:hover,.region-area:focus-visible{fill:rgba(246,238,214,.18);stroke:#f6eed6;outline:none}
+.region-area.active{fill:rgba(201,162,76,.25);stroke:#f6eed6;stroke-width:1.7}
+#pinLayer{position:absolute;inset:0;pointer-events:none}
+.pin{pointer-events:auto;width:16px;height:16px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:50%;transform:translate(-50%,-50%) scale(var(--marker-scale,1));display:grid;place-items:center}
+.pin-dot{display:block;width:6px;height:6px;background:#c9a24c;border:1px solid #1a2b56;border-radius:50%;box-shadow:0 0 0 1px rgba(246,238,214,.85);transition:background .15s,box-shadow .15s}
+.pin:hover .pin-dot,.pin:focus-visible .pin-dot{background:#f6eed6;box-shadow:0 0 0 3px rgba(246,238,214,.35)}
+.pin.active .pin-dot{background:#fff;border-color:#1a2b56;box-shadow:0 0 0 3px rgba(201,162,76,.65)}
+.pin:focus-visible{outline:1px solid #f6eed6;outline-offset:2px}
+.pin-label{font:14px var(--font-en);background:#1a2b56;top:-3px;border:1px solid #c9a24c;z-index:2}
+.pin:hover,.pin:focus-visible,.pin.active{z-index:3}
+.panel-detail.on{border-top:0;border-bottom:1px solid var(--rule);border-left:3px solid var(--gold);background:var(--gold-pale);margin:0;padding:16px}
+.panel-detail h3{line-height:1.35}.panel-detail p{font-size:16px;line-height:1.55}
+.panel-list{min-height:0}.map-panel{max-height:700px}
+@media(max-width:900px){.map-panel{max-height:none}.panel-list{max-height:220px}}
+@media(pointer:coarse){.pin{width:20px;height:20px}.pin-dot{width:7px;height:7px}}
+
 </style>
 </head>
 <body>
@@ -236,15 +256,27 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
     </button>
   </div>
   <p class="section-desc">
-    <span class="rune">ちず の いち を クリック して ください。ドラッグ で いどう、＋／－ で ズーム できます。</span>
-    <span class="eng">Click any marker to open its record. Drag to pan, use +/− to zoom. Gold circles are cities and landmarks; navy squares are regions and territories.</span>
+    <span class="rune">ちいき や まち を えらぶ と きろく が ひらきます。ドラッグ で いどう、ズーム で くわしく みられます。</span>
+    <span class="eng">Select a territory or city to read its record. Drag to explore; zoom in to distinguish nearby locations.</span>
   </p>
 
   <div class="map-shell">
     <div class="map-stage">
       <div class="map-frame" id="mapFrame" tabindex="0" aria-label="World map, draggable and zoomable">
         <div class="map-inner" id="mapInner">
-          <img src="assets/world-map.jpg" alt="World map of the Grand Beyond" draggable="false">
+          <img src="assets/world-map.png" alt="World map of the Grand Beyond" draggable="false">
+          <svg xmlns="http://www.w3.org/2000/svg" id="regionLayer" viewBox="0 0 1651 953" aria-label="Selectable territories">
+<path id="region-16" class="region-area" data-i="16" d="M 315,174 L 307,154 L 312,140 L 303,130 L 315,112 L 319,90 L 335,71 L 331,54 L 352,46 L 361,29 L 393,40 L 416,44 L 443,30 L 465,29 L 492,43 L 521,46 L 550,51 L 570,46 L 578,34 L 588,28 L 598,45 L 600,74 L 606,95 L 617,113 L 629,135 L 647,148 L 650,170 L 663,194 L 661,212 L 669,231 L 666,252 L 654,273 L 640,286 L 624,282 L 600,275 L 574,262 L 565,244 L 562,228 L 554,218 L 550,207 L 556,196 L 562,183 L 552,179 L 541,169 L 535,155 L 528,152 L 515,155 L 502,153 L 496,141 L 488,135 L 482,123 L 471,120 L 455,112 L 443,115 L 419,124 L 403,130 L 401,148 L 382,155 L 379,168 L 369,173 L 352,162 L 338,167 L 331,171 Z" tabindex="0" role="button" aria-label="Republic of Padokea" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Republic of Padokea</title></path>
+<path id="region-17" class="region-area" data-i="17" d="M 315,174 L 331,171 L 338,167 L 352,162 L 369,173 L 379,168 L 382,155 L 401,148 L 403,130 L 419,124 L 443,115 L 455,112 L 471,120 L 482,123 L 488,135 L 496,141 L 502,153 L 515,155 L 528,152 L 535,155 L 541,169 L 552,179 L 562,183 L 556,196 L 550,207 L 554,218 L 562,228 L 565,244 L 574,262 L 565,256 L 543,247 L 521,231 L 501,214 L 474,207 L 454,208 L 438,216 L 418,227 L 400,239 L 384,256 L 364,261 L 345,246 L 326,233 L 319,210 L 310,192 Z" tabindex="0" role="button" aria-label="Mimbo Republic" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Mimbo Republic</title></path>
+<path id="region-18" class="region-area" data-i="18" d="M 220,269 L 228,283 L 247,285 L 259,280 L 267,290 L 274,316 L 283,325 L 295,349 L 312,351 L 323,360 L 339,349 L 357,336 L 360,322 L 348,311 L 337,297 L 332,279 L 313,265 L 296,246 L 279,224 L 260,195 L 252,174 L 236,150 L 228,120 L 217,113 L 208,126 L 207,145 L 199,163 L 199,189 L 192,218 L 192,244 L 202,267 L 193,295 L 191,316 L 185,343 L 178,369 L 185,389 L 182,408 L 181,427 L 196,442 L 215,446 L 229,440 L 249,439 L 265,450 L 294,447 L 318,459 L 347,452 L 372,447 L 390,445 L 395,433 L 404,428 L 397,412 L 399,394 L 388,373 L 383,357 L 366,344 L 357,336 L 339,349 L 323,360 L 312,351 L 295,349 L 283,325 L 274,316 L 267,290 L 259,280 L 247,285 L 228,283 Z" tabindex="0" role="button" aria-label="Kukan'yu Kingdom" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Kukan'yu Kingdom</title></path>
+<path id="region-19" class="region-area" data-i="19" d="M 419,376 L 431,366 L 440,353 L 449,345 L 456,344 L 462,326 L 474,318 L 476,334 L 471,349 L 460,363 L 449,368 L 440,378 L 429,387 L 418,386 Z" tabindex="0" role="button" aria-label="Jappon" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Jappon</title></path>
+<path id="region-20" class="region-area" data-i="20" d="M 218,693 L 234,698 L 249,694 L 262,699 L 268,694 L 276,704 L 290,707 L 298,714 L 309,715 L 320,725 L 344,712 L 361,714 L 378,724 L 394,724 L 402,731 L 416,725 L 418,711 L 435,709 L 447,696 L 470,688 L 480,666 L 474,655 L 489,649 L 484,625 L 487,609 L 482,593 L 486,578 L 491,568 L 489,547 L 475,537 L 463,520 L 443,517 L 424,507 L 412,500 L 400,505 L 380,512 L 357,517 L 347,508 L 342,486 L 329,479 L 318,484 L 300,480 L 283,470 L 268,461 L 251,459 L 245,473 L 237,492 L 222,490 L 212,482 L 204,489 L 186,484 L 169,493 L 179,508 L 170,519 L 158,524 L 159,539 L 149,551 L 158,560 L 174,549 L 182,537 L 196,533 L 210,522 L 219,533 L 218,552 L 235,566 L 236,590 L 224,606 L 229,632 L 216,652 L 218,673 Z" tabindex="0" role="button" aria-label="United States of Saherta" aria-pressed="false" vector-effect="non-scaling-stroke"><title>United States of Saherta</title></path>
+<path id="region-21" class="region-area" data-i="21" d="M 402,731 L 418,711 L 435,709 L 447,696 L 470,688 L 480,666 L 474,655 L 489,649 L 484,625 L 487,609 L 482,593 L 486,578 L 491,568 L 512,572 L 533,580 L 548,573 L 565,561 L 591,554 L 602,543 L 605,523 L 611,502 L 609,485 L 618,474 L 628,489 L 630,512 L 639,536 L 664,537 L 680,547 L 694,541 L 710,543 L 724,555 L 710,570 L 718,582 L 727,580 L 724,594 L 717,603 L 703,609 L 698,626 L 681,641 L 661,649 L 641,659 L 624,675 L 607,688 L 591,701 L 586,717 L 574,727 L 553,732 L 540,746 L 520,753 L 507,769 L 499,791 L 505,816 L 498,832 L 501,851 L 514,861 L 527,878 L 541,889 L 533,903 L 512,909 L 496,918 L 474,925 L 457,923 L 450,912 L 457,897 L 447,884 L 431,878 L 418,884 L 400,878 L 387,865 L 370,852 L 356,845 L 349,830 L 326,822 L 316,802 L 294,795 L 283,784 L 271,785 L 256,774 L 242,776 L 241,794 L 226,799 L 216,784 L 207,782 L 210,769 L 211,749 L 218,734 L 218,713 L 218,693 L 234,698 L 249,694 L 262,699 L 268,694 L 276,704 L 290,707 L 298,714 L 309,715 L 320,725 L 344,712 L 361,714 L 378,724 L 394,724 Z" tabindex="0" role="button" aria-label="Yorbia" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Yorbia</title></path>
+<path id="region-22" class="region-area" data-i="22" d="M 1168,277 L 1183,277 L 1193,272 L 1205,278 L 1218,271 L 1240,274 L 1261,273 L 1266,283 L 1293,284 L 1301,298 L 1319,296 L 1334,302 L 1349,305 L 1361,318 L 1372,316 L 1375,325 L 1387,322 L 1393,333 L 1408,335 L 1418,344 L 1441,351 L 1465,358 L 1472,342 L 1475,323 L 1490,309 L 1484,290 L 1502,276 L 1518,263 L 1523,243 L 1537,233 L 1535,211 L 1527,190 L 1515,172 L 1500,160 L 1488,163 L 1474,151 L 1460,154 L 1447,141 L 1435,150 L 1424,159 L 1416,164 L 1405,151 L 1400,133 L 1387,129 L 1383,120 L 1390,110 L 1381,101 L 1370,97 L 1372,87 L 1358,77 L 1351,64 L 1347,44 L 1334,37 L 1336,24 L 1326,14 L 1308,14 L 1301,25 L 1284,19 L 1276,37 L 1283,50 L 1295,57 L 1291,75 L 1303,91 L 1291,104 L 1282,128 L 1292,145 L 1282,161 L 1266,171 L 1260,192 L 1242,192 L 1227,207 L 1207,210 L 1190,213 L 1168,223 L 1146,224 L 1129,234 L 1110,238 L 1094,249 L 1085,267 L 1092,279 L 1095,299 L 1108,306 L 1126,299 L 1135,285 L 1150,279 L 1160,287 Z" tabindex="0" role="button" aria-label="Azia" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Azia</title></path>
+<path id="region-23" class="region-area" data-i="23" d="M 1168,277 L 1183,277 L 1193,272 L 1205,278 L 1218,271 L 1240,274 L 1261,273 L 1266,283 L 1293,284 L 1301,298 L 1319,296 L 1334,302 L 1349,305 L 1361,318 L 1372,316 L 1375,325 L 1387,322 L 1393,333 L 1408,335 L 1418,344 L 1441,351 L 1465,358 L 1457,377 L 1464,390 L 1452,400 L 1459,416 L 1476,428 L 1488,424 L 1500,432 L 1505,443 L 1490,445 L 1476,436 L 1461,440 L 1445,431 L 1428,438 L 1408,434 L 1392,438 L 1373,436 L 1360,446 L 1344,450 L 1324,448 L 1307,459 L 1291,464 L 1275,479 L 1250,486 L 1232,484 L 1213,488 L 1197,479 L 1181,486 L 1163,479 L 1144,475 L 1127,472 L 1117,457 L 1103,453 L 1103,438 L 1087,425 L 1074,409 L 1054,404 L 1040,390 L 1034,375 L 1055,367 L 1076,353 L 1088,337 L 1104,329 L 1123,316 L 1135,302 L 1151,298 L 1160,287 Z" tabindex="0" role="button" aria-label="Kakin Kingdom" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Kakin Kingdom</title></path>
+<path id="region-24" class="region-area" data-i="24" d="M 1103,453 L 1117,457 L 1127,472 L 1144,475 L 1163,479 L 1181,486 L 1197,479 L 1213,488 L 1232,484 L 1250,486 L 1275,479 L 1291,464 L 1307,459 L 1324,448 L 1344,450 L 1360,446 L 1373,436 L 1392,438 L 1408,434 L 1428,438 L 1445,431 L 1461,440 L 1454,455 L 1462,471 L 1480,480 L 1479,494 L 1470,499 L 1480,511 L 1472,529 L 1470,550 L 1490,556 L 1506,563 L 1500,577 L 1484,579 L 1476,591 L 1480,609 L 1466,626 L 1461,645 L 1444,653 L 1445,674 L 1433,697 L 1419,702 L 1405,697 L 1390,699 L 1371,697 L 1359,702 L 1357,689 L 1340,683 L 1345,675 L 1331,677 L 1300,686 L 1285,675 L 1274,679 L 1267,675 L 1263,683 L 1255,684 L 1244,694 L 1227,702 L 1215,713 L 1198,708 L 1184,698 L 1173,685 L 1165,668 L 1159,649 L 1149,637 L 1140,617 L 1145,600 L 1130,585 L 1120,589 L 1101,584 L 1092,570 L 1071,572 L 1062,562 L 1072,551 L 1060,534 L 1069,513 L 1083,497 L 1088,479 Z" tabindex="0" role="button" aria-label="Federation of Ochima" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Federation of Ochima</title></path>
+<path id="region-25" class="region-area" data-i="25" d="M 901,748 L 921,738 L 943,740 L 959,727 L 981,724 L 1006,718 L 1029,729 L 1042,745 L 1054,766 L 1054,789 L 1068,806 L 1062,825 L 1048,844 L 1032,855 L 1010,873 L 984,877 L 964,894 L 942,897 L 924,886 L 909,871 L 897,852 L 889,829 L 885,805 L 888,782 L 897,767 Z" tabindex="0" role="button" aria-label="Begerosse Union" aria-pressed="false" vector-effect="non-scaling-stroke"><title>Begerosse Union</title></path>
+</svg>
           <div id="pinLayer"></div>
         </div>
       </div>
@@ -260,8 +292,8 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
       <div class="panel-search">
         <input id="q" placeholder="けんさく — search locations" aria-label="Search locations">
       </div>
+      <div class="panel-detail" id="panelDetail" aria-live="polite"></div>
       <div class="panel-list" id="panelList"></div>
-      <div class="panel-detail" id="panelDetail"></div>
     </div>
   </div>
 </main>
@@ -287,58 +319,58 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
      or link "thread" to an anchor on the World Information page.
      ========================================================= */
   var LOCATIONS = [
-    {kind:"landmark", en:"Kukuroo Mountain", jp:"ククロー", x:20.64, y:12.15,
+    {kind:"landmark", en:"Kukuroo Mountain", jp:"ククロー", x:22.71351, y:13.32634,
       desc:"A testing ground associated with the Hunter Exam's more punishing trial sites."},
-    {kind:"landmark", en:"Heaven's Arena", jp:"てんくう", x:36.35, y:22.88,
+    {kind:"landmark", en:"Heaven's Arena", jp:"てんくう", x:36.28104, y:22.66527,
       desc:"A 251-floor tower where fighters climb for rank, money, and reputation."},
-    {kind:"landmark", en:"Hunter Selection Committee Hotel", jp:"いいんかい", x:14.06, y:27.38,
+    {kind:"landmark", en:"Hunter Selection Committee Hotel", jp:"いいんかい", x:15.68746, y:30.11542,
       desc:"Where the Committee convenes to set the terms of each year's Exam."},
-    {kind:"landmark", en:"Numere Wetlands", jp:"ヌメーレ", x:16.71, y:40.29,
+    {kind:"landmark", en:"Numere Wetlands", jp:"ヌメーレ", x:19.13992, y:43.23190,
       desc:"A dense marsh region known for unusual wildlife and difficult travel."},
-    {kind:"landmark", en:"Zaban City", jp:"ザバン", x:17.06, y:41.07,
+    {kind:"landmark", en:"Zaban City", jp:"ザバン", x:19.13992, y:45.96013,
       desc:"A major trade hub and common starting point for licensed travelers."},
-    {kind:"landmark", en:"Dolle Harbor", jp:"ドル", x:16.09, y:42.10,
+    {kind:"landmark", en:"Dolle Harbor", jp:"ドル", x:18.11024, y:46.90451,
       desc:"A busy port connecting Kukan'yu Kingdom to the wider shipping lanes."},
-    {kind:"landmark", en:"Glam Gas Land", jp:"グラムガス", x:17.60, y:53.32,
+    {kind:"landmark", en:"Glam Gas Land", jp:"グラムガス", x:20.89643, y:56.45331,
       desc:"An industrial gas-extraction region on the northern edge of Yorbia."},
-    {kind:"landmark", en:"Gordeau Desert", jp:"ゴルドー", x:11.25, y:60.99,
+    {kind:"landmark", en:"Gordeau Desert", jp:"ゴルドー", x:13.62810, y:66.52676,
       desc:"A wide, sparsely traveled desert bordering the western coast."},
-    {kind:"landmark", en:"Yorknew City", jp:"ヨークシン", x:11.16, y:62.08,
+    {kind:"landmark", en:"Yorknew City", jp:"ヨークシン", x:13.38583, y:67.99580,
       desc:"Home to the biennial Auction — and no shortage of trouble around it."},
-    {kind:"landmark", en:"Meteor City", jp:"りゅうせいがい", x:28.28, y:65.35,
+    {kind:"landmark", en:"Meteor City", jp:"りゅうせいがい", x:34.10055, y:71.35362,
       desc:"An unregistered settlement with no civil records. See the note on the World Information board."},
-    {kind:"landmark", en:"Kakin Port City", jp:"カキンこう", x:63.35, y:34.95,
+    {kind:"landmark", en:"Kakin Port City", jp:"カキンこう", x:66.20230, y:38.71983,
       desc:"The main sea gateway into the Kakin Empire."},
-    {kind:"landmark", en:"NGL", jp:"エヌジーエル", x:28.68, y:94.81,
+    {kind:"landmark", en:"NGL", jp:"エヌジーエル", x:28.77044, y:94.75341,
       desc:"A remote lake region, sparsely charted."},
-    {kind:"landmark", en:"Republic of Rakario", jp:"ラカリオ", x:29.71, y:93.86,
+    {kind:"landmark", en:"Republic of Rakario", jp:"ラカリオ", x:29.67898, y:94.01889,
       desc:"One of the small southern republics along the strait."},
-    {kind:"landmark", en:"Republic of West Gorteau", jp:"にしゴルトー", x:30.62, y:92.81,
+    {kind:"landmark", en:"Republic of West Gorteau", jp:"にしゴルトー", x:30.46638, y:92.96957,
       desc:"The western half of the Gorteau republics."},
-    {kind:"landmark", en:"Republic of East Gorteau", jp:"ひがしゴルトー", x:31.71, y:92.50,
+    {kind:"landmark", en:"Republic of East Gorteau", jp:"ひがしゴルトー", x:31.73834, y:92.96957,
       desc:"The eastern half of the Gorteau republics."},
-    {kind:"landmark", en:"Republic of Hass", jp:"ハス", x:32.50, y:93.34,
+    {kind:"landmark", en:"Republic of Hass", jp:"ハス", x:32.58631, y:93.49423,
       desc:"A small republic at the southern tip of Yorbia."},
 
-    {kind:"region", en:"Republic of Padokea", jp:"パドキア", x:21.20, y:4.46,
+    {kind:"region", en:"Republic of Padokea", jp:"パドキア", x:29.67898, y:8.91920,
       desc:"A northern republic on the Yorbia continent."},
-    {kind:"region", en:"Mimbo Republic", jp:"ミンボー", x:23.92, y:18.10,
+    {kind:"region", en:"Mimbo Republic", jp:"ミンボー", x:24.89400, y:20.98636,
       desc:"Home territory to Heaven's Arena."},
-    {kind:"region", en:"Kukan'yu Kingdom", jp:"クカンユー", x:14.48, y:39.45,
+    {kind:"region", en:"Kukan'yu Kingdom", jp:"クカンユー", x:17.26227, y:41.02833,
       desc:"A coastal kingdom encompassing Zaban City and Dolle Harbor."},
-    {kind:"region", en:"Jappon", jp:"ジャポン", x:28.62, y:33.58,
+    {kind:"region", en:"Jappon", jp:"ジャポン", x:27.13507, y:37.46065,
       desc:"An island chain east of Kukan'yu Kingdom."},
-    {kind:"region", en:"United States of Saherta", jp:"サヘルタ", x:17.66, y:56.45,
+    {kind:"region", en:"United States of Saherta", jp:"サヘルタ", x:21.19927, y:61.17524,
       desc:"A federation of states spanning central Yorbia."},
-    {kind:"region", en:"Yorbia", jp:"ヨルビア", x:19.53, y:66.42,
+    {kind:"region", en:"Yorbia", jp:"ヨルビア", x:23.74319, y:71.77335,
       desc:"The western continent — home to Yorknew City, Meteor City, and the southern republics."},
-    {kind:"region", en:"Azia", jp:"アジア", x:72.80, y:30.90,
+    {kind:"region", en:"Azia", jp:"アジア", x:77.77105, y:34.83736,
       desc:"The northern reach of the eastern continent."},
-    {kind:"region", en:"Kakin Kingdom", jp:"カキン", x:71.50, y:39.40,
+    {kind:"region", en:"Kakin Kingdom", jp:"カキン", x:76.31738, y:44.28122,
       desc:"A large, wealthy kingdom on the eastern continent."},
-    {kind:"region", en:"Federation of Ochima", jp:"オチマ", x:74.32, y:54.30,
+    {kind:"region", en:"Federation of Ochima", jp:"オチマ", x:79.34585, y:64.53305,
       desc:"A federation occupying the southern half of the eastern continent."},
-    {kind:"region", en:"Begerosse Union", jp:"ベゲロス", x:58.93, y:67.89,
+    {kind:"region", en:"Begerosse Union", jp:"ベゲロス", x:59.35796, y:83.52571,
       desc:"An island union south of the eastern continent."}
   ];
 
@@ -357,17 +389,20 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
   var selected = -1;
 
   LOCATIONS.forEach(function(loc, i){
+    if(loc.kind === "region") return;
     var b = document.createElement("button");
     b.className = "pin" + (loc.kind === "region" ? " region" : "");
     b.style.left = loc.x + "%";
     b.style.top = loc.y + "%";
     b.setAttribute("aria-label", loc.en);
+    b.setAttribute("aria-pressed", "false");
     b.dataset.i = i;
     var label = document.createElement("span");
     label.className = "pin-label";
     label.innerHTML = dual(loc.jp,loc.en);
+    var dot=document.createElement("span");dot.className="pin-dot";dot.setAttribute("aria-hidden","true");b.appendChild(dot);
     b.appendChild(label);
-    b.addEventListener("click", function(e){ e.stopPropagation(); if(!moved) select(i); });
+    b.addEventListener("click", function(e){ e.stopPropagation(); if(!moved || e.detail === 0) select(i); });
     pinLayer.appendChild(b);
   });
 
@@ -396,15 +431,18 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
   listEl.addEventListener("click", function(e){
     var btn = e.target.closest(".panel-row");
     if(!btn) return;
-    select(parseInt(btn.dataset.i, 10));
+    select(parseInt(btn.dataset.i, 10), true);
   });
   qEl.addEventListener("input", renderList);
 
-  function select(i){
+  function select(i, center){
     selected = i;
     var loc = LOCATIONS[i];
     var pins = pinLayer.querySelectorAll(".pin");
-    pins.forEach(function(p){ p.classList.toggle("active", parseInt(p.dataset.i,10) === i); });
+    pins.forEach(function(p){ p.classList.toggle("active", parseInt(p.dataset.i,10) === i); p.setAttribute("aria-pressed",String(parseInt(p.dataset.i,10) === i)); });
+    document.querySelectorAll(".region-area").forEach(function(area){
+      var active=Number(area.dataset.i)===i;area.classList.toggle("active",active);area.setAttribute("aria-pressed",String(active));
+    });
     renderList();
 
     detailEl.className = "panel-detail on";
@@ -414,9 +452,15 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
       '<p>' + dual(loc.descKana,loc.desc) + '</p>';
 
     // gently center the map on the selected pin
-    panTo(loc.x, loc.y);
+    if(center) panTo(loc.x, loc.y);
   }
 
+  document.querySelectorAll(".region-area").forEach(function(area){
+    area.addEventListener("click",function(e){e.stopPropagation();if(!moved || e.detail === 0) select(Number(area.dataset.i));});
+    area.addEventListener("keydown",function(e){
+      if(e.key === "Enter" || e.key === " "){e.preventDefault();e.stopPropagation();select(Number(area.dataset.i));}
+    });
+  });
   renderList();
 
   /* ---------------- pan & zoom ---------------- */
@@ -425,6 +469,7 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
   var MIN_SCALE = 1, MAX_SCALE = 5;
 
   function apply(){
+    inner.style.setProperty("--marker-scale",1/scale);
     inner.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + scale + ")";
   }
   function clamp(){
@@ -469,44 +514,31 @@ footer{ margin-top:40px; border-top:3px solid var(--ink); background:var(--paper
     zoomAt(e.deltaY < 0 ? 1.15 : 1/1.15, e.clientX - rect.left, e.clientY - rect.top);
   }, { passive:false });
 
-  // drag to pan (mouse + touch)
-  var dragging = false, startX, startY, startTx, startTy, moved = false;
-  function dragStart(x,y){
-    dragging = true; moved = false;
-    startX = x; startY = y; startTx = tx; startTy = ty;
-    inner.classList.add("dragging");
-    frame.classList.add("grabbing");
-  }
-  function dragMove(x,y){
-    if(!dragging) return;
-    var dx = x - startX, dy = y - startY;
-    if(Math.abs(dx) > 3 || Math.abs(dy) > 3){ moved = true; }
-    tx = startTx + dx; ty = startTy + dy;
-    clamp();
-    apply();
-  }
-  function dragEnd(){
-    dragging = false;
-    inner.classList.remove("dragging");
-    frame.classList.remove("grabbing");
-  }
-  frame.addEventListener("mousedown", function(e){ if(e.button === 0) dragStart(e.clientX, e.clientY); });
-  window.addEventListener("mousemove", function(e){ dragMove(e.clientX, e.clientY); });
-  window.addEventListener("mouseup", dragEnd);
-  frame.addEventListener("touchstart", function(e){
-    var t = e.touches[0]; dragStart(t.clientX, t.clientY);
-  }, { passive:true });
-  frame.addEventListener("touchmove", function(e){
-    var t = e.touches[0]; dragMove(t.clientX, t.clientY);
-  }, { passive:true });
-  frame.addEventListener("touchend", dragEnd);
-  frame.addEventListener("touchcancel", dragEnd);
-
-  // clicking empty map area (not a pin, not a drag) clears selection
-  frame.addEventListener("click", function(e){
-    if(moved) return;
-    if(e.target.closest(".pin")) return;
+  // Pointer events cover mouse, touch and pen; a drag never opens a record.
+  var dragging=false,startX=0,startY=0,startTx=0,startTy=0,moved=false,pointerId=null;
+  frame.addEventListener("pointerdown",function(e){
+    if(e.button !== 0 || pointerId !== null) return;
+    dragging=true;moved=false;pointerId=e.pointerId;
+    startX=e.clientX;startY=e.clientY;startTx=tx;startTy=ty;
+    inner.classList.add("dragging");frame.classList.add("grabbing");
   });
+  window.addEventListener("pointermove",function(e){
+    if(!dragging || e.pointerId !== pointerId) return;
+    var dx=e.clientX-startX,dy=e.clientY-startY;
+    if(Math.abs(dx)>4 || Math.abs(dy)>4){
+      moved=true;
+      if(!frame.hasPointerCapture(e.pointerId)) frame.setPointerCapture(e.pointerId);
+    }
+    if(moved){tx=startTx+dx;ty=startTy+dy;clamp();apply();}
+  });
+  function endDrag(e){
+    if(e.pointerId !== pointerId) return;
+    dragging=false;pointerId=null;
+    inner.classList.remove("dragging");frame.classList.remove("grabbing");
+    if(frame.hasPointerCapture(e.pointerId)) frame.releasePointerCapture(e.pointerId);
+  }
+  window.addEventListener("pointerup",endDrag);
+  window.addEventListener("pointercancel",endDrag);
 
   window.addEventListener("resize", function(){ clamp(); apply(); });
 
