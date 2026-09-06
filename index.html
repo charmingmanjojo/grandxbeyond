@@ -498,6 +498,31 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
 
 .skip{position:absolute; left:-9999px; background:var(--ink); color:#fff; padding:10px 16px; z-index:99;}
 .skip:focus{left:0; top:0;}
+[hidden]{display:none!important}
+.panel,.board,.auth-body,.browser{box-shadow:none;border-width:1px}
+.btn,.translate-toggle,.acct-chip{box-shadow:none;border-width:1px}
+.btn:active,.translate-toggle:active{transform:translateY(1px)}
+.masthead,nav.boardnav{border-bottom-width:1px}
+.section-head{border-bottom:2px solid var(--navy)}
+.grid-cards{gap:28px 24px;grid-template-columns:repeat(auto-fit,minmax(min(268px,100%),1fr))}
+.icard{border:0;border-top:2px solid var(--gold);box-shadow:none;padding:18px 0 8px}
+.icard .meta{border-top:1px solid var(--rule)}
+.board-head{background:var(--navy);color:#fff}
+.board-row{border-top:1px solid var(--rule)}
+.board-ico{border:0;background:transparent}
+.auth-body{border-top:2px solid var(--navy)}
+.browser{border-top:3px solid var(--navy)}
+.browser-chrome{border-bottom-width:1px;background:#f6eed6}
+.hero>*,.board-row>*,.browser-chrome>*,.urlbar{min-width:0}
+.urlbar input{min-width:0;width:100%}
+@media(max-width:520px){
+ main{padding-left:16px;padding-right:16px}.hero{gap:20px}
+ .board-head,.board-row{grid-template-columns:30px minmax(0,1fr);padding:12px;gap:10px}
+ .board-stat{display:none}.board-head>*:nth-child(n+3){display:none}
+ .browser-chrome{gap:5px;padding:8px}.chrome-btn{width:28px;padding:3px}
+ .auth-body{padding:18px 14px}.sheet-foot{flex-wrap:wrap}
+ .card-flip{max-width:100%}.boardnav-inner{gap:6px}
+}
 </style>
 </head>
 <body>
@@ -609,6 +634,12 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
           <span></span><span><span class="rune">いた</span><span class="eng">Board</span></span>
           <span><span class="rune">スレ</span><span class="eng">Threads</span></span><span><span class="rune">じょうたい</span><span class="eng">Status</span></span>
         </div>
+        <a class="board-row" href="map/map.html">
+          <span class="board-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 4l6 2 6-2v16l-6 2-6-2-6 2V6z"/><path d="M9 4v16M15 6v16"/></svg></span>
+          <span><span class="t"><span class="rune">せかいちず</span><span class="eng">World Map</span></span><span class="d"><span class="rune">たいりく・とし・りょういき を クリックで さがす</span><span class="eng">Click through continents, cities, and territories</span></span></span>
+          <span class="board-stat"><b>26</b><span class="rune">ちてん</span><span class="eng">locations</span></span>
+          <span class="board-stat"><span class="rune">こうかい</span><span class="eng">Open</span></span>
+        </a>
         <a class="board-row" href="#nen">
           <span class="board-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span>
           <span><span class="t"><span class="rune">ねんろん</span><span class="eng">Nen Theory</span></span><span class="d"><span class="rune">６けいとう・すいけんげん・きそしゅぎょう</span><span class="eng">Six categories, water divination, basic training</span></span></span>
@@ -799,7 +830,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
 
 <div class="devbar">
   <div class="devbar-in" id="devbarIn">
-    <span id="devbarText">Dev controls — in-memory only; wire to Supabase/Discord later. Hunter status is granted by <b>staff via Discord role</b>, not by a form here. The character sheet now lives inside the Tavern. Secret address: <b>sakaba.hxa</b> (<code>TAVERN_HOST</code> in the script).</span>
+    <span id="devbarText">Dev controls — in-memory only; wire to Supabase/Discord later. Hunter status is granted by <b>staff via Discord role</b>, not by a form here. The character sheet now lives inside the Tavern. </span>
     <button id="devFill">1. Create test account</button>
     <button id="devHunter">2. Grant Hunter role (staff)</button>
     <button id="devUrl">3. Autofill Tavern URL</button>
@@ -819,6 +850,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   </div>
 </footer>
 
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
@@ -828,8 +860,8 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   // Fill these in from Supabase → Project Settings → API.
   // Until you do, the site stays in DEMO mode and the Dev controls
   // at the bottom of the page keep working exactly as before.
-  var SUPABASE_URL = "YOUR_SUPABASE_URL";
-  var SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+  var SUPABASE_URL = window.GXB_CONFIG.supabaseUrl;
+  var SUPABASE_ANON_KEY = window.GXB_CONFIG.supabaseAnonKey;
   var LIVE = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
   var sb = LIVE ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -983,9 +1015,10 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
     show("world");
   });
 
-  function discordSignIn(){
+  async function discordSignIn(){
     if(LIVE){
-      sb.auth.signInWithOAuth({ provider:"discord", options:{ redirectTo: window.location.href } });
+      var res = await sb.auth.signInWithOAuth({ provider:"discord", options:{ redirectTo: window.location.origin + window.location.pathname } });
+      if(res.error){ $("loginErr").textContent = res.error.message; $("loginErr").classList.add("show"); }
       return;
     }
     // DEMO fallback: simulate a Discord sign-in with no real backend
@@ -998,8 +1031,9 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
 
   $("logoutBtn").addEventListener("click", function(){
     if(LIVE){ sb.auth.signOut(); }
+    authGeneration++;
     state.account = null; state.sheet = null;
-    document.body.classList.remove("is-hunter");
+    setHunter(false);
     applyAccount();
     show("world");
   });
@@ -1018,55 +1052,53 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
     return null;
   }
 
+  var syncing = false, authGeneration = 0;
   async function afterSignIn(){
-    var userRes = await sb.auth.getUser();
-    var user = userRes.data && userRes.data.user;
-    if(!user) return;
-
-    var prof = await fetchProfileWithRetry(user.id);
-    if(!prof) return;
-
-    if(!prof.license_number){
-      var lic = makeLicenseNumber();
-      var upd = await sb.from("profiles")
-        .update({ license_number: lic })
-        .eq("id", user.id)
-        .is("license_number", null)
-        .select()
-        .maybeSingle();
-      if(upd.data){ prof = upd.data; }
-    }
-
+    if(syncing) return;
+    syncing = true;
+    var generation = authGeneration;
+    setHunter(false);
     try{
-      var syncRes = await sb.functions.invoke("sync-roles");
-      if(syncRes && syncRes.data){
-        prof.rank = syncRes.data.rank;
-        prof.is_hunter = syncRes.data.is_hunter;
+      var userRes = await sb.auth.getUser();
+      if(userRes.error) throw userRes.error;
+      var user = userRes.data.user;
+      if(!user) return;
+      var prof = await fetchProfileWithRetry(user.id);
+      if(!prof) throw new Error("Profile missing. Check the auth.users profile trigger.");
+      for(var attempt=0; !prof.license_number && attempt<3; attempt++){
+        var upd = await sb.from("profiles").update({license_number:makeLicenseNumber()})
+          .eq("id",user.id).is("license_number",null).select().maybeSingle();
+        if(upd.error && upd.error.code !== "23505") throw upd.error;
+        prof = await fetchProfileWithRetry(user.id);
       }
-    }catch(syncErr){
-      console.warn("role sync failed:", syncErr);
-    }
-
-    state.account = {
-      name: prof.display_name || "Hunter",
-      line: "discord",
-      license: prof.license_number || "————————————"
-    };
-    applyAccount();
-    setHunter(!!prof.is_hunter);
+      if(!prof || !prof.license_number) throw new Error("Could not issue license. Please retry.");
+      if(generation !== authGeneration) return;
+      state.account = {name:prof.display_name || "Hunter",line:"discord",license:prof.license_number};
+      applyAccount();
+      var syncRes = await sb.functions.invoke("sync-roles", {body:{}});
+      if(syncRes.error) throw syncRes.error;
+      if(!syncRes.data || syncRes.data.error) throw new Error(syncRes.data && syncRes.data.error || "Empty role sync response");
+      if(generation !== authGeneration) return;
+      setHunter(syncRes.data.is_hunter === true || syncRes.data.rank >= 6);
+      $("loginErr").classList.remove("show");
+    }catch(err){
+      if(generation !== authGeneration) return;
+      setHunter(false);
+      $("loginErr").textContent = "Could not verify access: " + err.message;
+      $("loginErr").classList.add("show");
+      show("login");
+      console.warn("Account setup:",err);
+    }finally{ syncing=false; }
   }
-
   if(LIVE){
-    sb.auth.onAuthStateChange(function(_event, session){
-      if(session){ afterSignIn(); }
-      else{
-        state.account = null; state.sheet = null;
-        document.body.classList.remove("is-hunter");
-        applyAccount();
+    sb.auth.onAuthStateChange(function(event, session){
+      if(!session){
+        authGeneration++;
+        state.account=null; state.sheet=null; setHunter(false); applyAccount();
+      } else if(event === "INITIAL_SESSION" || event === "SIGNED_IN"){
+        // Supabase calls must run after the auth callback releases its lock.
+        setTimeout(afterSignIn,0);
       }
-    });
-    sb.auth.getSession().then(function(res){
-      if(res.data && res.data.session){ afterSignIn(); }
     });
   }
 
@@ -1076,7 +1108,10 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   function setHunter(on){
     state.hunter = !!on;
     document.body.classList.toggle("is-hunter", state.hunter);
-    if(!state.hunter && $("view-tavern").classList.contains("active")){ show("world"); }
+    if(!state.hunter){
+      if($("view-tavern").classList.contains("active")) show("world");
+      if(vp){ renderHome(); browserEl.classList.remove("cinema"); document.body.style.overflow=""; }
+    }
   }
 
   // ================= FAKE BROWSER =================
@@ -1121,6 +1156,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   }
 
   function renderTavern(){
+    if(!state.hunter) return;
     vp.className = "viewport frame";
     vp.innerHTML = '<iframe id="tavernFrame" src="' + TAVERN_PAGE + '" title="Hunter\'s Tavern" allow="autoplay; fullscreen"></iframe>';
     setStatus("かんりょう", "Loaded");
@@ -1173,6 +1209,8 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   // ---------- tavern iframe: go cinematic for the cutscene ----------
   var browserEl = document.querySelector(".browser");
   window.addEventListener("message", function(ev){
+    var frame = $("tavernFrame");
+    if(ev.origin !== window.location.origin || !frame || ev.source !== frame.contentWindow) return;
     var d = ev.data;
     if(!d || d.t !== "tavern") return;
     if(d.scene === "intro" || d.scene === "expand"){
@@ -1181,7 +1219,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
     } else if(d.scene === "registry" || d.scene === "collapse"){
       browserEl.classList.remove("cinema");
       document.body.style.overflow = "";
-      setStatus("かんりょう", "Loaded — sakaba.hxa");
+      setStatus("かんりょう", "Loaded");
     }
   });
 
@@ -1206,10 +1244,12 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   // Once real Supabase keys are filled in above, the mock buttons step
   // aside — logging in for real now drives everything through them.
   if(LIVE){
-    $("devFill").style.display = "none";
-    $("devHunter").style.display = "none";
-    $("devUrl").style.display = "none";
-    $("devbarText").innerHTML = 'LIVE mode — connected to <b>' + SUPABASE_URL.replace(/^https:\/\//,"") + '</b>. Sign in with Discord above; rank and Tavern access come from the <b>sync-roles</b> Edge Function. Secret address: <b>sakaba.hxa</b>.';
+    document.querySelector(".devbar").hidden = true;
+    document.querySelector(".auth-tabs").hidden=true;
+    $("pane-in").querySelector(".fgrid").hidden=true;
+    $("pane-in").querySelector(".swipe-strip").hidden=true;
+    $("pane-in").querySelector(".sheet-foot").hidden=true;
+    $("pane-in").querySelector(".auth-divider").hidden=true;
   }
 
   applyAccount();
