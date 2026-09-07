@@ -583,7 +583,6 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
           <p><span class="rune">ここは こうかい されている せかいじょうほうばん です。だれでも よめます。ハンターめんきょ を もつ ものだけが、その さきへ すすめます。</span><span class="eng">This is the public World Information board. Anyone may read it. Only those carrying a Hunter License go any further than this.</span></p>
           <div class="hero-cta">
             <button class="btn primary" data-goto="login"><span class="rune">めんきょばんごう を にゅうりょく</span><span class="eng">Enter License Number</span></button>
-            <button class="btn" data-goto="character"><span class="rune">キャラクターシート</span><span class="eng">Character Sheet</span></button>
           </div>
         </div>
 
@@ -807,10 +806,34 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   // Fill these in from Supabase → Project Settings → API.
   // Until you do, the site stays in DEMO mode and the Dev controls
   // at the bottom of the page keep working exactly as before.
-  var SUPABASE_URL = window.GXB_CONFIG.supabaseUrl;
-  var SUPABASE_ANON_KEY = window.GXB_CONFIG.supabaseAnonKey;
+  // config.js is intentionally NOT shipped in update packages, so that
+  // re-uploading the site never overwrites your live Supabase key.
+  // If it is ever missing, fall back safely instead of white-screening.
+  var CFG = window.GXB_CONFIG || {};
+  var SUPABASE_URL = CFG.supabaseUrl || "";
+  var SUPABASE_ANON_KEY = CFG.supabaseAnonKey || "";
+  if(!CFG.supabaseUrl){
+    console.warn("config.js missing or not loaded — running in DEMO mode.");
+  }
   var LIVE = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY" && SUPABASE_ANON_KEY.length > 20;
-  var sb = LIVE ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+  // The Supabase client comes from a CDN. Some mobile networks, DNS
+  // filters and ad blockers block that CDN. If it did not load we must
+  // NOT let it throw — an uncaught error here kills the whole script
+  // and the entire page stops working. Degrade gracefully instead.
+  var sb = null;
+  if(LIVE){
+    if(window.supabase && typeof window.supabase.createClient === "function"){
+      try{
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }catch(e){
+        console.error("Supabase client failed to initialise:", e);
+      }
+    } else {
+      console.error("Supabase library did not load (CDN blocked?). Accounts unavailable.");
+    }
+    if(!sb){ LIVE = false; window.__GXB_CDN_BLOCKED = true; }
+  }
 
   // ---------- state ----------
   var state = { account:null, sheet:null };
@@ -1233,12 +1256,18 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
   // Once real Supabase keys are filled in above, the mock buttons step
   // aside — logging in for real now drives everything through them.
   if(LIVE){
+    // Discord is the only way in. Everything below is legacy DEMO
+    // scaffolding (manual account name / phone line / passcode) and
+    // is removed entirely so nobody tries to fill it in.
     document.querySelector(".devbar").hidden = true;
-    document.querySelector(".auth-tabs").hidden=true;
-    $("pane-in").querySelector(".fgrid").hidden=true;
-    $("pane-in").querySelector(".swipe-strip").hidden=true;
-    $("pane-in").querySelector(".sheet-foot").hidden=true;
-    $("pane-in").querySelector(".auth-divider").hidden=true;
+    document.querySelector(".auth-tabs").hidden = true;
+    $("pane-up").hidden = true;                 // the whole Sign Up form
+    $("pane-up").classList.remove("active");
+    $("pane-in").classList.add("active");       // always show the Discord pane
+    $("pane-in").querySelector(".fgrid").hidden = true;
+    $("pane-in").querySelector(".swipe-strip").hidden = true;
+    $("pane-in").querySelector(".sheet-foot").hidden = true;
+    $("pane-in").querySelector(".auth-divider").hidden = true;
   }
 
   applyAccount();
