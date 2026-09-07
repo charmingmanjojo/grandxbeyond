@@ -134,6 +134,7 @@ nav.boardnav{background:var(--paper); border-bottom:3px solid var(--ink);}
 .translate-toggle:hover{background:var(--gold-pale);}
 .translate-toggle:active{transform:translate(3px,3px); box-shadow:0 0 0;}
 .translate-toggle:focus-visible{outline:3px solid var(--gold-deep); outline-offset:2px;}
+.translate-toggle .btn-label{font-family:var(--font-en);}
 .translate-toggle .dot{width:9px; height:9px; background:var(--danger); border:1px solid var(--ink);}
 body.translated .translate-toggle .dot{background:#2f7d3f;}
 
@@ -561,7 +562,7 @@ footer{margin-top:56px; border-top:3px solid var(--ink); background:var(--paper)
     <div class="boardnav-right">
       <button class="translate-toggle" id="translateBtn" aria-pressed="false">
         <span class="dot" aria-hidden="true"></span>
-        <span class="rune">ほんやく</span><span class="eng">Translate</span>
+        <span class="btn-label">Translate</span>
       </button>
       <button class="tab" data-view="login" id="tab-login"><span class="rune">ログイン</span><span class="eng">Log In</span></button>
       <div class="acct-chip" id="acctChip" style="display:none;">
