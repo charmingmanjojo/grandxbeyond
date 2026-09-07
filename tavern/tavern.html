@@ -380,6 +380,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
         </div>
 
         <p id="reviewFeedback" hidden role="status"></p>
+        <section id="privateSheet" aria-label="Private character details"></section>
         <div class="fc-row">
           <div class="fc-box" id="fcBox"><span class="fc-ph">PHOTO</span></div>
           <div class="fc-fields">
@@ -391,22 +392,14 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
         <div class="g2">
           <label>Name (rune label)<input id="sName" placeholder="クロガネ・レン"></label>
           <label>Name (readable)<input id="sNameEn" placeholder="Ren Kurogane"></label>
-          <label>Alias<input id="sAlias"></label><label>Occupation<input id="sOccupation"></label><label>Affiliation<input id="sAffiliation"></label>
+          <label>Nationality<input id="sNationality"></label><label>Expeditions completed (claim)<input id="sExpeditions" type="number" min="0" step="1"></label><label>Hunter specialization<input id="sSpecialization"></label><label>Alias<input id="sAlias"></label><label>Occupation<input id="sOccupation"></label><label>Affiliation<input id="sAffiliation"></label>
           <label>Age<input id="sAge" type="number" min="0" max="200"></label>
           <label>Height (cm)<input id="sHeight" type="number" min="0" max="300"></label>
-          <label>License class
-            <select id="sLicense">
-              <option>Rookie Hunter</option><option>Hunter</option>
-              <option>Blacklist Hunter</option><option>Specialist Hunter</option>
-              <option>Double Star</option><option>Triple Star</option>
-            </select>
+          <label>Hunter status
+            <select id="sLicense" disabled><option>Non-Hunter</option><option>Aspiring Hunter</option><option>Licensed Hunter</option></select>
           </label>
-          <label>Nen category
-            <select id="sNen">
-              <option>Undetermined</option><option>Enhancer</option><option>Transmuter</option>
-              <option>Conjurer</option><option>Emitter</option><option>Manipulator</option><option>Specialist</option>
-            </select>
-          </label>
+          <p class="full">Hunter status is confirmed through Discord or verified expedition progression. Star ranks are staff awards.</p>
+          <p class="full">Edit private Nen, Hatsu and training points with <strong>/sheet</strong> in the Discord Hunter forum.</p>
           <label class="full">Place of origin
             <select id="sOrigin">
               <option value="">—</option>
@@ -463,6 +456,9 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
   </div>
 </div>
 
+<script src="nen-wheel.js"></script>
+<script src="registry-record.js"></script>
+<script src="private-sheet.js"></script>
 <script>
 (function(){
   "use strict";
@@ -536,9 +532,8 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
       jp: row.name_rune || "なまえ なし",
       en: row.name_en,
       meta:{
-        "めんきょ": row.license_class || "—",
-        "ねん": row.nen_category || "—",
-        "しゅっしん": ORIGIN_LABEL[row.origin] || row.origin || "—"
+        "めんきょ": row.license_class || "Non-Hunter",
+        "しゅっしん": row.nationality || ORIGIN_LABEL[row.origin] || row.origin || "—"
       },
       note: row.background || ""
     };
@@ -547,7 +542,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
   async function loadLiveRegistry(){
     if(!LIVE || !allowed) return;
     try{
-      var res = await sb.from("hunter_registry").select("*").order("name_en");
+      var res = await sb.from("character_registry").select("*").order("name_en");
       if(res.error){ console.warn("registry query failed:", res.error); listEl.textContent="Could not load registry: "+res.error.message; return; }
       ENTRIES = TOPICS.concat((res.data || []).map(rowToEntry));
       render();
@@ -770,6 +765,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
 
   function showCard(i){
     var e = ENTRIES[i];
+    if(LIVE && e.type==="hunter" && e.id){cardEl.className="card";window.renderRegistryRecord(sb,cardEl,e.id).catch(function(err){cardEl.textContent=err.message;});return;}
     var dl = "";
     for(var k in e.meta){ dl += "<dt>" + esc(k) + "</dt><dd>" + esc(e.meta[k]) + "</dd>"; }
     cardEl.className = "card";
@@ -848,15 +844,30 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
     img.alt = "Faceclaim"; img.src = url;
   });
 
+  async function loadPrivateSheet(character, pane){
+    var marker=character.id;pane.dataset.character=marker;pane.replaceChildren();
+    try{
+      var res=await sb.from("character_private").select("sections").eq("character_id",marker).maybeSingle();
+      if(pane.dataset.character!==marker || (pane.id==="privateSheet" && editingId!==marker)) return;
+      if(res.error) throw res.error;
+      window.renderHunterPrivateSheet(pane,(res.data||{}).sections||{});
+      if(character.faceclaim_path){
+        var imageResult=await sb.storage.from("hunter-faceclaims").createSignedUrl(character.faceclaim_path,900);
+        if(pane.dataset.character!==marker || (pane.id==="privateSheet" && editingId!==marker)) return;
+        if(imageResult.data && imageResult.data.signedUrl){var img=document.createElement("img");img.alt="Character faceclaim";img.src=imageResult.data.signedUrl;img.style.maxWidth="160px";pane.appendChild(img);}
+      }
+    }catch(error){if(pane.dataset.character===marker)pane.textContent="Private sheet could not be loaded: "+error.message;}
+  }
   function clearForm(){
     editingId = null;
+    $("sNationality").value="";$("sExpeditions").value="0";$("sSpecialization").value="";
     $("sAlias").value=""; $("sOccupation").value=""; $("sAffiliation").value="";
     $("reviewFeedback").hidden=true;
     $("fcUrl").value = ""; $("fcUrl").dispatchEvent(new Event("input"));
     $("fcCredit").value = "";
     $("sName").value = ""; $("sNameEn").value = "";
     $("sAge").value = ""; $("sHeight").value = "";
-    $("sLicense").value = "Rookie Hunter"; $("sNen").value = "Undetermined";
+    $("sLicense").value = "Non-Hunter"; $("privateSheet").replaceChildren();
     $("sOrigin").value = ""; $("sOrigin").dispatchEvent(new Event("change"));
     $("sBio").value = "";
     $("mcWho").value = ""; $("mcBio").value = ""; $("mcFrom").value = ""; $("mcTies").value = "";
@@ -864,13 +875,14 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
 
   function fillForm(row, ooc){
     editingId = row.id;
+    $("sNationality").value=row.nationality||"";$("sExpeditions").value=row.expeditions_claimed||0;$("sSpecialization").value=row.specialization||"";
     $("sAlias").value=row.alias || ""; $("sOccupation").value=row.occupation || ""; $("sAffiliation").value=row.affiliation || "";
     $("sName").value = row.name_rune || "";
     $("sNameEn").value = row.name_en || "";
     $("sAge").value = row.age || "";
     $("sHeight").value = row.height_cm || "";
-    $("sLicense").value = row.license_class || "Rookie Hunter";
-    $("sNen").value = row.nen_category || "Undetermined";
+    $("sLicense").value = row.license_class || "Non-Hunter";
+    loadPrivateSheet(row, $("privateSheet"));
     $("fcUrl").value = row.faceclaim_url || ""; $("fcUrl").dispatchEvent(new Event("input"));
     $("fcCredit").value = row.faceclaim_credit || "";
     $("sOrigin").value = row.origin || ""; $("sOrigin").dispatchEvent(new Event("change"));
@@ -890,7 +902,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
     if(!currentUser) return;
     var res = await sb.from("characters").select("*").eq("owner_id", currentUser.id).order("created_at");
     if(res.error) throw res.error;
-    myCharacters = res.data || [];
+    myCharacters = (res.data || []).filter(function(c){return !c.deceased_at;});
     var picker = $("sPicker");
     var opts = ['<option value="">+ New character</option>'];
     myCharacters.forEach(function(c){
@@ -931,6 +943,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
   function collectPayload(status){
     var isMeteor = $("sOrigin").value === "meteor";
     return {
+      nationality:$("sNationality").value.trim(),expeditions_claimed:Number($("sExpeditions").value||0),specialization:$("sSpecialization").value.trim(),
       name_rune: $("sName").value.trim(),
       name_en: $("sNameEn").value.trim(),
       alias:$("sAlias").value.trim(),occupation:$("sOccupation").value.trim(),affiliation:$("sAffiliation").value.trim(),
@@ -939,7 +952,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
       faceclaim_url: $("fcUrl").value.trim(),
       faceclaim_credit: $("fcCredit").value.trim(),
       license_class: $("sLicense").value,
-      nen_category: $("sNen").value,
+      sheet_version: (myCharacters.find(function(c){return c.id===editingId;}) || {}).sheet_version,
       origin: $("sOrigin").value,
       background: isMeteor ? null : $("sBio").value.trim(),
       status: status
@@ -1010,7 +1023,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
   async function loadPending(){
     $("reviewMessage").textContent="Loading pending submissions…";
     $("reviewSheet").replaceChildren(); selectedReview=null;
-    var res=await sb.from("characters").select("*").eq("status","pending").order("updated_at");
+    var res=await sb.from("characters").select("*").eq("status","pending").is("deceased_at",null).order("updated_at");
     if(res.error){$("reviewMessage").textContent=res.error.message;return;}
     pendingSheets=res.data || [];
     $("reviewMessage").textContent=pendingSheets.length ? pendingSheets.length+" pending" : "No pending submissions.";
@@ -1027,7 +1040,7 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
     if(res.error){$("reviewMessage").textContent=res.error.message;return;}
     var pane=$("reviewSheet");pane.replaceChildren();
     var heading=document.createElement("h3"); heading.textContent=row.name_en;pane.appendChild(heading);
-    var fields={owner_id:"Account",name_rune:"Kana name",name_en:"Name",alias:"Alias",age:"Age",height_cm:"Height (cm)",faceclaim_url:"Faceclaim URL",faceclaim_credit:"Image credit (OOC)",origin:"Origin",license_class:"License class",nen_category:"Nen category",background:"Background",occupation:"Occupation",affiliation:"Affiliation",review_note:"Previous review note"};
+    var fields={owner_id:"Account",name_rune:"Kana name",name_en:"Name",alias:"Alias",age:"Age",height_cm:"Height (cm)",faceclaim_url:"Faceclaim URL",faceclaim_credit:"Image credit (OOC)",origin:"Origin",license_class:"License class",background:"Background",occupation:"Occupation",affiliation:"Affiliation",review_note:"Previous review note"};
     function field(label,value){var dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=value || "—";dl.append(dt,dd);}
     var dl=document.createElement("dl");pane.appendChild(dl);
     Object.keys(fields).forEach(function(key){field(fields[key],row[key]);});
@@ -1035,6 +1048,11 @@ body{font-size:18px;--link:#1a2b56;--link-hot:#1a2b56}
       var ooc=res.data || {};
       field("ADMIN ONLY — Who is this character?",ooc.who_is_this);field("Background (OOC)",ooc.background_ooc);field("Origin (OOC)",ooc.from_ooc);field("Ties (OOC)",ooc.ties_ooc);
     }
+    var registryPane=document.createElement("section");pane.appendChild(registryPane);
+    await window.renderRegistryRecord(sb,registryPane,row.id);
+    var privatePane=document.createElement("section");pane.appendChild(privatePane);
+    await loadPrivateSheet(row,privatePane);
+    if(selectedReview !== row) return;
     var label=document.createElement("label");label.textContent="Note to player (required for rejection)";
     var note=document.createElement("textarea");note.rows=4;label.appendChild(note);pane.appendChild(label);
     var actions=document.createElement("div");actions.className="review-actions";pane.appendChild(actions);
